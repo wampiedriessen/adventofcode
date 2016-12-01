@@ -60,12 +60,14 @@ fn main() {
             }
 
             // println!("Command: {}", s);
-            if !double && saved.contains(&p) {
-                println!("Second time on this location:");
-                print_loc(p);
-                double = true;
-            } else {
-                saved.push(p);
+            if !double {
+                if saved.contains(&p) {
+                    println!("Second time on this location:");
+                    print_loc(p);
+                    double = true;
+                } else {
+                    saved.push(p);
+                }
             }
 
             steps -= 1;
