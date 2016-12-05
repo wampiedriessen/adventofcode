@@ -1,0 +1,7 @@
+[package]
+name = "advent_of_code"
+version = "0.0.1"
+authors = ["Wampie Driessen <wampiedriessen@gmail.com>"]
+
+[dependencies]
+rust-crypto = "0.2.36"
