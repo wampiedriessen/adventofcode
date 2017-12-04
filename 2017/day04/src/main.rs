@@ -29,7 +29,6 @@ fn is_anagram(a:&str, b:&str) -> bool {
 fn contains_anagram(v: &Vec<String>, s:&str) -> bool {
     for word in v {
         if is_anagram(word, s) {
-            println!("ANAGRAMS: {} - {}", word, s);
             return true;
         }
     }
