@@ -48,6 +48,7 @@ fn main() {
         let mut correct2:bool = true;
         for word in line.unwrap().trim().split(" ") {
             if v.contains(&word.to_string()) { correct1 = false; }
+            if !correct1 { break; }
             if contains_anagram(&v, &word.to_string()) { correct2 = false; }
             v.push(word.to_string());
         }
