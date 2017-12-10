@@ -2,8 +2,8 @@ use std::fmt::Write;
 
 fn reverse(v: &mut [u8; 256], start:u8, len: u8) {
     for i in 0..(len / 2) {
-        let a = start + i;
-        let b = start + len - i - 1;
+        let a = start.wrapping_add(i);
+        let b = start.wrapping_add(len).wrapping_sub(i).wrapping_sub(1);
         let tmp = v[a as usize];
         v[a as usize] = v[b as usize];
         v[b as usize] = tmp;
@@ -47,8 +47,8 @@ fn part1(input: String, mut list: [u8; 256]) {
 
         reverse(&mut list, index, len);
 
-        index += len + skipsize;
-        skipsize += 1;
+        index = index.wrapping_add(len).wrapping_add(skipsize);
+        skipsize = skipsize.wrapping_add(1);
     }
 
     println!("{:?},", list[0] as u32 * list[1] as u32);
@@ -69,8 +69,8 @@ fn part2(input: String, mut list: [u8; 256]) {
         for len in &bytes {
             reverse(&mut list, index, *len);
 
-            index += len + skipsize;
-            skipsize += 1;
+            index = index.wrapping_add(len).wrapping_add(skipsize);
+            skipsize = skipsize.wrapping_add(1);
         }
     }
 
