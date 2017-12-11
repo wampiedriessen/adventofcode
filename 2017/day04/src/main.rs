@@ -1,29 +1,19 @@
-use std::collections::HashMap;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::fs::File;
 
 fn is_anagram(a:&str, b:&str) -> bool {
-
     if a.len() != b.len() {
         return false;
     }
 
-    let mut d: HashMap<char, i32> = HashMap::new();
-    for c in a.trim().chars() {
-        d.entry(c).or_insert(0);
-        *d.get_mut(&c).unwrap() += 1;
-    }
-    for c in b.trim().chars() {
-        if !d.contains_key(&c) {
-            return false;
-        }
-        *d.get_mut(&c).unwrap() -= 1;
-        if *d.get(&c).unwrap() == -1 {
-            return false;
-        }
-    }
-    return true;
+    let mut av:Vec<char> = a.chars().collect();
+    let mut bv:Vec<char> = b.chars().collect();
+
+    av.sort();
+    bv.sort();
+
+    return av == bv;
 }
 
 fn contains_anagram(v: &Vec<String>, s:&str) -> bool {
@@ -48,7 +38,6 @@ fn main() {
         let mut correct2:bool = true;
         for word in line.unwrap().trim().split(" ") {
             if v.contains(&word.to_string()) { correct1 = false; }
-            if !correct1 { break; }
             if contains_anagram(&v, &word.to_string()) { correct2 = false; }
             v.push(word.to_string());
         }
@@ -60,6 +49,6 @@ fn main() {
         }
     }
 
-    println!("1: {:?}", valid1);
-    println!("2: {:?}", valid2);
+    println!("Part 1: {:?}", valid1);
+    println!("Part 2: {:?}", valid2);
 }
