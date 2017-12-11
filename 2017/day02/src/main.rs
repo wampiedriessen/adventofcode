@@ -26,7 +26,6 @@ fn main() {
     let mut v = std::vec::Vec::with_capacity(15);
 
     for line in reader.lines() {
-
         for num in line.unwrap().trim().split("\t") {
             if num == "" {
                 continue;
@@ -40,8 +39,9 @@ fn main() {
         sum2 += divisive_numbers(&mut v);
         sum += v[v.len()-1] - v[0];
         v.clear();
-
-        println!("Sum: {}", sum);
-        println!("Sum2: {}", sum2);
     }
+
+
+    println!("Part 1: {}", sum);
+    println!("Part 2: {}", sum2);
 }
