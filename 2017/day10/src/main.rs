@@ -1,6 +1,7 @@
 use std::fmt::Write;
 
-fn reverse(v: &mut [u8; 256], start:u8, len: u8) {
+fn hash_step(v: &mut [u8; 256], index:&mut u8, skipsize:&mut u8, len: u8) {
+    let start = index.clone();
     for i in 0..(len / 2) {
         let a = start.wrapping_add(i);
         let b = start.wrapping_add(len).wrapping_sub(i).wrapping_sub(1);
@@ -8,6 +9,9 @@ fn reverse(v: &mut [u8; 256], start:u8, len: u8) {
         v[a as usize] = v[b as usize];
         v[b as usize] = tmp;
     }
+
+    *index = index.wrapping_add(len.clone()).wrapping_add(*skipsize);
+    *skipsize = skipsize.wrapping_add(1);
 }
 
 fn dense_hash(v: &[u8;256]) -> [u8; 16] {
@@ -32,23 +36,20 @@ fn main() {
         list[i] = i as u8;
     }
 
-    println!("Part 1:");
+    print!("Part 1: ");
     part1(input.clone(), list.clone());
-    println!("Part 2:");
+    print!("Part 2: ");
     part2(input, list);
 }
 
 fn part1(input: String, mut list: [u8; 256]) {
     let mut index:u8 = 0;
-    let mut skipsize = 0;
+    let mut skipsize:u8 = 0;
 
     for length in input.split(",") {
         let len = length.parse::<u8>().unwrap();
 
-        reverse(&mut list, index, len);
-
-        index = index.wrapping_add(len).wrapping_add(skipsize);
-        skipsize = skipsize.wrapping_add(1);
+        hash_step(&mut list, &mut index, &mut skipsize, len);
     }
 
     println!("{:?},", list[0] as u32 * list[1] as u32);
@@ -56,7 +57,7 @@ fn part1(input: String, mut list: [u8; 256]) {
 
 fn part2(input: String, mut list: [u8; 256]) {
     let mut index:u8 = 0;
-    let mut skipsize = 0;
+    let mut skipsize:u8 = 0;
 
     let mut bytes:Vec<u8> = input.into_bytes();
     bytes.push(17);
@@ -67,17 +68,14 @@ fn part2(input: String, mut list: [u8; 256]) {
 
     for _i in 0..64 {
         for len in &bytes {
-            reverse(&mut list, index, *len);
-
-            index = index.wrapping_add(len).wrapping_add(skipsize);
-            skipsize = skipsize.wrapping_add(1);
+            hash_step(&mut list, &mut index, &mut skipsize, *len);
         }
     }
 
     let dh = dense_hash(&list);
     let mut hash: String = String::new();
     for &byte in dh.iter() {
-        write!(&mut hash, "{:02X}", byte).unwrap();
+        write!(&mut hash, "{:02x}", byte).unwrap();
     }
     println!("{:?}", hash);
 }
