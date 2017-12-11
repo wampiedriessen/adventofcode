@@ -43,17 +43,8 @@ fn main() {
         }
     }
 
-    let mut max:i32 = 0;
-    let mut maxname = String::new();
+    let max = registers.values().max().unwrap();
 
-    for name in registers.keys() {
-        let val = *registers.get(name).unwrap();
-        if val > max {
-            max = val;
-            maxname = name.clone();
-        }
-    }
-
-    println!("Max: {:?} in {:?}", max, maxname);
-    println!("Max ever: {:?}", maxvalever);
+    println!("Part 1: {:?}", max);
+    println!("Part 2: {:?}", maxvalever);
 }   
