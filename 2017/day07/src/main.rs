@@ -3,33 +3,60 @@ use std::io::prelude::*;
 use std::io::BufReader;
 use std::fs::File;
 
+#[derive(Debug,Clone)]
 struct Node {
     name: String,
     weight: i32,
+    total_weight: i32,
     children: Vec<String>,
 }
 
-fn dfs(universe: &HashMap<String,Node>, n: &Node) -> i32 {
-    let mut nodes:Vec<&Node> = Vec::new();
-    let mut weights:Vec<i32> = Vec::new();
-    let mut total: i32 = n.weight;
-    for child in &n.children {
-        let node = universe.get(child).unwrap();
-        let w = dfs(universe, node);
-        weights.push(w);
-        nodes.push(&node);
-        total += w;
+fn fill_total_weight(mut universe: &mut HashMap<String,Node>, name: String) -> i32 {
+    let mut node:Node = universe.get_mut(&name).unwrap().clone();
+    node.total_weight = node.weight;
+    for childname in &node.children {
+        node.total_weight += fill_total_weight(&mut universe, childname.clone());
     }
-    if weights.len() > 0 {
-        let a = weights[0];
-        for i in 1..weights.len() {
-            if weights[i] != a {
-                print!("{:?} ({:?}) Total: {:?} ", nodes[i].name, nodes[i].weight, weights[i]);
-                println!("differs from {:?} ({:?}) Total: {:?}", nodes[0].name, nodes[0].weight, weights[0]);
-            }
+    universe.insert(node.name.clone(), node.clone());
+    return node.total_weight.clone();
+}
+
+fn fix_wrong_weight(universe: &HashMap<String,Node>, name: String, weight: i32, diff: i32) {
+    let node:&Node = universe.get(&name).unwrap();
+    for childname in &node.children {
+        let child:&Node = universe.get(childname).unwrap();
+        if child.total_weight == weight {
+            println!("Part 2: {:?}", child.weight - diff);
+            return;
         }
     }
-    return total;
+}
+
+fn find_inbalance(universe: &HashMap<String,Node>, name: String) -> bool {
+    let node:&Node = universe.get(&name).unwrap();
+    let mut weights:Vec<i32> = Vec::new();
+    for childname in &node.children {
+        let child:&Node = universe.get(childname).unwrap();
+        if find_inbalance(universe,childname.clone()) {
+            return true;
+        }
+        weights.push(child.total_weight);
+    }
+
+    weights.sort();
+
+    if weights.len() > 0 && weights[0] != weights[weights.len()-1] {
+        let diff = weights[weights.len()-1] - weights[0];
+        let wrongweight;
+        if weights[0] == weights[1] {
+            wrongweight = weights[weights.len()-1];
+        } else {
+            wrongweight = weights[0];
+        }
+        fix_wrong_weight(universe, name, wrongweight, diff);
+        return true;
+    }
+    return false;
 }
 
 fn main() {
@@ -55,6 +82,7 @@ fn main() {
         allnodes.insert(arguments[0].to_string(), Node {
             name: arguments[0].to_string(),
             weight: arguments[1].parse::<i32>().unwrap(),
+            total_weight: 0,
             children: children
         });
         nodesleft.push(arguments[0].to_string());
@@ -69,7 +97,9 @@ fn main() {
         }
     }
 
-    println!("rootnode: {:?}", &rootnode);
+    println!("Part 1: {:?}", &rootnode);
 
-    dfs(&allnodes, allnodes.get(&rootnode).unwrap());
+    fill_total_weight(&mut allnodes, rootnode.clone());
+
+    find_inbalance(&allnodes, rootnode);
 }
