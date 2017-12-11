@@ -1,10 +1,13 @@
+use std::io::prelude::*;
+use std::io::BufReader;
+use std::fs::File;
+
 fn main() {
-    println!("Input:");
-
     let mut input = String::new();
+    let f = File::open("input.txt").expect("no file?");
+    let mut reader = BufReader::new(f);
 
-    std::io::stdin().read_line(&mut input)
-        .expect("Failed to read line");
+    reader.read_line(&mut input).expect("Failed to read line");
 
     let mut sum = 0;
     let mut last:char = ' ';
@@ -28,8 +31,7 @@ fn main() {
         sum += last.to_string().parse::<u32>().unwrap();;
     }
 
-    println!("Sum1:");
-    println!("{}", sum);
+    println!("Part 1: {:?}", sum);
 
     let length = input.trim().len();
     let lookahead = length / 2;
@@ -41,6 +43,5 @@ fn main() {
         }
     }
 
-    println!("Sum2:");
-    println!("{}", sum);
+    println!("Part 2: {:?}", sum);
 }
