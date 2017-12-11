@@ -4,16 +4,17 @@ use std::fs::File;
 
 fn main() {
     let f = File::open("input.txt").expect("no file?");
-    let reader = BufReader::new(f);
+    let mut reader = BufReader::new(f);
 
-    let line = reader.lines().next().unwrap().unwrap();
+    let mut line = String::new();
+    reader.read_line(&mut line).expect("Could not read line");
 
     let mut nw: i32 = 0;
     let mut n: i32 = 0;
     let mut ne: i32 = 0;
     let mut max: i32 = 0;
 
-    for dir in line.split(",") {
+    for dir in line.trim().split(",") {
         match dir {
             "nw" => nw += 1,
             "n" => n += 1,
@@ -49,9 +50,6 @@ fn main() {
         }
     }
 
-    println!("Steps N: {:?}", n);
-    println!("Steps NE: {:?}", ne);
-    println!("Steps NW: {:?}", nw);
-    println!("Steps: {:?}", n+ne+nw);
-    println!("Max: {:?}", max);
+    println!("Part 1: {:?}", n+ne+nw);
+    println!("Part 2: {:?}", max);
 }
