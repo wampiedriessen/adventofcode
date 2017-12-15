@@ -1,23 +1,32 @@
-fn main() {
-    // let input = "flqrgnkx".to_string();
-    let input = "uugsqrei".to_string();
+fn has_bit(ch:u8, i:usize) -> bool{
+    let two:u8 = 2;
+    return (ch & two.pow(i as u32)) != 0;
+}
+
+fn generate_empty_knothash() -> [u8; 256] {
     let mut hash: [u8; 256] = [0; 256];
 
     for i in 0..256 {
         hash[i] = i as u8;
     }
 
-    let mut grid:[[bool;128]; 128] = [[false; 128];128];
+    return hash;
+}
+
+fn main() {
+    let input = "uugsqrei".to_string();
+    let hash: [u8; 256] = generate_empty_knothash();
+
+    let mut grid:[[i32;128]; 128] = [[-1; 128];128];
     let mut squares_filled = 0;
-    let two:u8 = 2;
 
     for i in 0..128 {
         let key = input.clone() + "-" + &i.to_string();
         let hash = knot_hash(key.to_string(), hash);
         for j in 0..16 {
             for k in 0..8 {
-                if (hash[j] & two.pow(7-k as u32)) > 0 {
-                    grid[i][j*8+k] = true;
+                if has_bit(hash[j], 7-k) {
+                    grid[i][j*8+k] = 0;
                     squares_filled += 1;
                 }
             }
@@ -26,41 +35,32 @@ fn main() {
 
     println!("Part 1: {:?}", squares_filled);
 
-    let mut groupgrid:[[u32;128];128] = [[0;128];128];
-    let mut groupcount:u32 = 0;
+    let mut groupcount:i32 = 0;
 
     for i in 0..128 {
         for j in 0..128 {
-            if grid[i][j] && groupgrid[i][j] == 0 {
+            if grid[i][j] == 0 {
                 groupcount += 1;
-                fill_group(groupcount, grid, &mut groupgrid, i, j);
+                fill_group(groupcount, &mut grid, i, j);
             }
         }
     }
     println!("Part 2: {:?}", groupcount);
 }
 
-fn fill_group(groupcount:u32, grid:[[bool; 128]; 128], mut groupgrid:&mut [[u32;128];128], i:usize, j:usize) {
-    groupgrid[i][j] = groupcount;
-    if i != 0 {
-        if grid[i-1][j] && groupgrid[i-1][j] == 0 {
-            fill_group(groupcount, grid, &mut groupgrid, i-1,j);
-        }
+fn fill_group(groupcount:i32, mut grid:&mut [[i32;128];128], i:usize, j:usize) {
+    grid[i][j] = groupcount;
+    if i != 0 && grid[i-1][j] == 0 {
+        fill_group(groupcount, &mut grid, i-1,j);
     }
-    if j != 0 {
-        if grid[i][j-1] && groupgrid[i][j-1] == 0 {
-            fill_group(groupcount, grid, &mut groupgrid, i,j-1);
-        }
+    if j != 0 && grid[i][j-1] == 0 {
+        fill_group(groupcount, &mut grid, i,j-1);
     }
-    if i != 127 {
-        if grid[i+1][j] && groupgrid[i+1][j] == 0 {
-            fill_group(groupcount, grid, &mut groupgrid, i+1,j);
-        }
+    if i != 127 && grid[i+1][j] == 0 {
+        fill_group(groupcount, &mut grid, i+1,j);
     }
-    if j != 127 {
-        if grid[i][j+1] && groupgrid[i][j+1] == 0 {
-            fill_group(groupcount, grid, &mut groupgrid, i,j+1);
-        }
+    if j != 127 && grid[i][j+1] == 0 {
+        fill_group(groupcount, &mut grid, i,j+1);
     }
 }
 

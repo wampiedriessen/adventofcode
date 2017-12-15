@@ -3,13 +3,24 @@ use std::io::prelude::*;
 use std::io::BufReader;
 use std::fs::File;
 
-fn calc_severity(scanners: &HashMap<i32, i32>, delay: i32) -> i32 {
-    let mut severity = 0;
+fn is_unseen(scanners: &HashMap<i32, i32>, delay: i32) -> bool {
     for index in scanners.keys() {
         let range = scanners.get(index).unwrap();
 
         if (delay+index) % ((range-1)*2) == 0 {
-            severity += (index+delay)*range;
+            return false;
+        }
+    }
+    return true;
+}
+
+fn calc_severity(scanners: &HashMap<i32, i32>) -> i32 {
+    let mut severity = 0;
+    for index in scanners.keys() {
+        let range = scanners.get(index).unwrap();
+
+        if index % ((range-1)*2) == 0 {
+            severity += index*range;
         }
     }
     return severity;
@@ -33,14 +44,13 @@ fn main() {
         scanners.insert(index, range);
     }
 
-    let mut severity = calc_severity(&scanners, 0);
+    let severity = calc_severity(&scanners);
     let mut delay = 0;
 
     println!("Part 1: {:?}", severity);
 
-    while severity > 0 {
+    while !is_unseen(&scanners, delay) {
         delay += 1;
-        severity = calc_severity(&scanners, delay);
     }
 
     println!("Part 2: {:?}", delay);
