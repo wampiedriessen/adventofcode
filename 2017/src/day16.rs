@@ -1,8 +1,18 @@
-use std::collections::HashMap;
-
 #[cfg(test)]
 mod tests {
   use super::*;
+
+  #[test]
+  fn part1_sample_test() {
+    let instr = parse_input("s1,x3/4,pe/b");
+    assert_eq!("baedc", run1(&instr,vec!['a','b','c','d','e']));
+  }
+
+  #[test]
+  fn part2_sample_test() {
+    let instr = parse_input("s1,x3/4,pe/b");
+    assert_eq!("abcde", run2(&instr,vec!['a','b','c','d','e']));
+  }
 
   #[test]
   fn part1_test() {
@@ -28,18 +38,18 @@ pub fn part1() -> String {
 
     let line = start_dance();
 
-    let instructions = parse_input(input);
-
-    return run1(&instructions, line.clone()).into_iter().collect();
+    return run1(&parse_input(input), line);
 }
 
 pub fn part2() -> String {
     let input = include_str!("../inputs/day16.txt").trim();
 
-    return run2(parse_input(input));
+    let line = start_dance();
+
+    return run2(&parse_input(input), line);
 }
 
-fn run1(instructions:&Vec<Instruction>, mut line:Vec<char>) -> Vec<char> {
+fn run1(instructions:&Vec<Instruction>, mut line:Vec<char>) -> String {
     for mv in instructions {
         if mv.fun == 0 {
             for _ in 0..mv.a {
@@ -57,21 +67,18 @@ fn run1(instructions:&Vec<Instruction>, mut line:Vec<char>) -> Vec<char> {
             line.swap(a, b);
         }
     }
-    return line;
+    return line.into_iter().collect();
 }
 
-fn run2(instructions:Vec<Instruction>, ) -> String {
-    let line2 = start_dance();
-    let mut line:String = line2.into_iter().collect();
-    let mut seen:HashMap<String, String> = HashMap::new();
-    for _ in 0..1000000000 {
-        if seen.contains_key(&line) {
-            line = seen.get(&line).unwrap().clone();
-        } else {
-            let lin = run1(&instructions, line.chars().collect());
-            seen.insert(line, lin.clone().into_iter().collect());
-            line = lin.into_iter().collect();
+fn run2(instructions:&Vec<Instruction>, line:Vec<char>) -> String {
+    let mut line:String = line.into_iter().collect();
+    let mut seen:Vec<String> = Vec::new();
+    for i in 0..1000000000 {
+        if seen.contains(&line) {
+            return seen[1000000000 % i].clone();
         }
+        seen.push(line.clone());
+        line = run1(&instructions, line.chars().collect());
     }
     return line;
 }
@@ -103,9 +110,10 @@ fn parse_input(input:&str) -> Vec<Instruction> {
                 p1: '\t',
                 p2: '\t',
             });
+            continue;
         }
+        let progs:Vec<&str> = arg2.split("/").collect();
         if first == 'x' {
-            let progs:Vec<&str> = arg2.split("/").collect();
             instructions.push(Instruction {
                 fun: 1,
                 a: progs[0].parse::<u8>().unwrap(),
@@ -115,7 +123,6 @@ fn parse_input(input:&str) -> Vec<Instruction> {
             });
         }
         if first == 'p' {
-            let progs:Vec<&str> = arg2.split("/").collect();
             instructions.push(Instruction {
                 fun: 2,
                 a: 0,
