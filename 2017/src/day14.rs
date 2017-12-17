@@ -1,3 +1,90 @@
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn part1_sample_test() {
+    assert_eq!(8108, run1("flqrgnkx".to_string()));
+  }
+
+  #[test]
+  fn part2_sample_test() {
+    assert_eq!(1242, run2("flqrgnkx".to_string()));
+  }
+
+  #[test]
+  fn part1_test() {
+    assert_eq!(8194, part1());
+  }
+
+  #[test]
+  fn part2_test() {
+    assert_eq!(1141, part2());
+  }
+}
+
+pub fn part1() -> i32 {
+    let input = include_str!("../inputs/day14.txt").trim();
+
+    return run1(input.to_string());
+}
+
+pub fn part2() -> i32 {
+    let input = include_str!("../inputs/day14.txt").trim();
+
+    return run2(input.to_string());
+}
+
+fn run1(input:String) -> i32 {
+    let grid:[[i32;128]; 128] = generate_grid(input);
+    let mut squares_filled = 0;
+
+    for i in 0..128 {
+        for j in 0..128 {
+            if grid[i][j] == 0 {
+                squares_filled += 1;
+            }
+        }
+    }
+
+    return squares_filled;
+}
+
+fn run2(input:String) -> i32 {
+    let mut grid:[[i32; 128]; 128] = generate_grid(input);
+    let mut groupcount:i32 = 0;
+
+    for i in 0..128 {
+        for j in 0..128 {
+            if grid[i][j] == 0 {
+                groupcount += 1;
+                fill_group(groupcount, &mut grid, i, j);
+            }
+        }
+    }
+
+    return groupcount;
+}
+
+fn generate_grid(input:String) -> [[i32; 128]; 128] {
+    let hash = generate_empty_knothash();
+    let mut grid:[[i32;128]; 128] = [[-1; 128];128];
+
+    for i in 0..128 {
+        let key = input.clone() + "-" + &i.to_string();
+        let hash = knot_hash(key.to_string(), hash);
+        for j in 0..16 {
+            for k in 0..8 {
+                if has_bit(hash[j], 7-k) {
+                    grid[i][j*8+k] = 0;
+                }
+            }
+        }
+    }
+
+    return grid;
+}
+
 fn has_bit(ch:u8, i:usize) -> bool{
     let two:u8 = 2;
     return (ch & two.pow(i as u32)) != 0;
@@ -11,41 +98,6 @@ fn generate_empty_knothash() -> [u8; 256] {
     }
 
     return hash;
-}
-
-fn main() {
-    let input = "uugsqrei".to_string();
-    let hash: [u8; 256] = generate_empty_knothash();
-
-    let mut grid:[[i32;128]; 128] = [[-1; 128];128];
-    let mut squares_filled = 0;
-
-    for i in 0..128 {
-        let key = input.clone() + "-" + &i.to_string();
-        let hash = knot_hash(key.to_string(), hash);
-        for j in 0..16 {
-            for k in 0..8 {
-                if has_bit(hash[j], 7-k) {
-                    grid[i][j*8+k] = 0;
-                    squares_filled += 1;
-                }
-            }
-        }
-    }
-
-    println!("Part 1: {:?}", squares_filled);
-
-    let mut groupcount:i32 = 0;
-
-    for i in 0..128 {
-        for j in 0..128 {
-            if grid[i][j] == 0 {
-                groupcount += 1;
-                fill_group(groupcount, &mut grid, i, j);
-            }
-        }
-    }
-    println!("Part 2: {:?}", groupcount);
 }
 
 fn fill_group(groupcount:i32, mut grid:&mut [[i32;128];128], i:usize, j:usize) {

@@ -15,9 +15,10 @@ mod day05;
 // mod day11;
 // mod day12;
 // mod day13;
-// mod day14;
+mod day14;
 // mod day15;
 mod day16;
+mod day17;
 
 use std::env;
 use std::process::exit;
@@ -82,12 +83,14 @@ fn run(day:u32, part:u32) {
 		// (12, 2) => println!("{}", day12::part2()),
 		// (13, 1) => println!("{}", day13::part1()),
 		// (13, 2) => println!("{}", day13::part2()),
-		// (14, 1) => println!("{}", day14::part1()),
-		// (14, 2) => println!("{}", day14::part2()),
+		(14, 1) => println!("{}", day14::part1()),
+		(14, 2) => println!("{}", day14::part2()),
 		// (15, 1) => println!("{}", day15::part1()),
 		// (15, 2) => println!("{}", day15::part2()),
 		(16, 1) => println!("{}", day16::part1()),
 		(16, 2) => println!("{}", day16::part2()),
+		(17, 1) => println!("{}", day17::part1()),
+		(17, 2) => println!("{}", day17::part2()),
 		_ => println!("Day {} part {} not found", day, part),
 	}
 }
