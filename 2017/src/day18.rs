@@ -114,6 +114,7 @@ fn run2(input:String) -> i64 {
 				if queue[p].len() > 0 {
 					let reg = regs[p].entry(args[1].chars().next().unwrap()).or_insert(0);
 					*reg = queue[p].remove(0);
+					waiting[p] = false;
 				} else {
 					waiting[p] = true;
 					continue; // dont increase prog_counter
