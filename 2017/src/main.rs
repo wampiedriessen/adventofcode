@@ -9,7 +9,7 @@ mod day04;
 mod day05;
 mod day06;
 mod day07;
-// mod day08;
+mod day08;
 // mod day09;
 // mod day10;
 // mod day11;
@@ -75,8 +75,8 @@ fn run(day:u32, part:u32) {
 		(06, 2) => println!("{}", day06::part2()),
 		(07, 1) => println!("{}", day07::part1()),
 		(07, 2) => println!("{}", day07::part2()),
-		// (08, 1) => println!("{}", day08::part1()),
-		// (08, 2) => println!("{}", day08::part2()),
+		(08, 1) => println!("{}", day08::part1()),
+		(08, 2) => println!("{}", day08::part2()),
 		// (09, 1) => println!("{}", day09::part1()),
 		// (09, 2) => println!("{}", day09::part2()),
 		// (10, 1) => println!("{}", day10::part1()),
