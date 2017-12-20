@@ -1,8 +1,64 @@
-use std::io::prelude::*;
-use std::io::BufReader;
-use std::fs::File;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-fn calc_score(line: String) {
+    #[test]
+    fn part1_sample_test() {
+        assert_eq!(1, run1("{}"));
+        assert_eq!(6, run1("{{{}}}"));
+        assert_eq!(5, run1("{{},{}}"));
+        assert_eq!(16, run1("{{{},{},{{}}}}"));
+        assert_eq!(1, run1("{<a>,<a>,<a>,<a>}"));
+        assert_eq!(9, run1("{{<ab>},{<ab>},{<ab>},{<ab>}}"));
+        assert_eq!(9, run1("{{<!!>},{<!!>},{<!!>},{<!!>}}"));
+        assert_eq!(3, run1("{{<a!>},{<a!>},{<a!>},{<ab>}}"));
+    }
+
+    #[test]
+    fn part2_sample_test() {
+        assert_eq!(0, run2("<>"));
+        assert_eq!(17, run2("<random characters>"));
+        assert_eq!(3, run2("<<<<>"));
+        assert_eq!(2, run2("<{!>}>"));
+        assert_eq!(0, run2("<!!>"));
+        assert_eq!(0, run2("<!!!>>"));
+        assert_eq!(10, run2("<{o\"i!a,<{i<a>"));
+    }
+
+    #[test]
+    fn part1_test() {
+        assert_eq!(11846, part1());
+    }
+
+    #[test]
+    fn part2_test() {
+        assert_eq!(6285, part2());
+    }
+}
+
+pub fn part1() -> u32 {
+    let input = include_str!("../inputs/day09.txt");
+
+    return run1(input);
+}
+
+pub fn part2() -> u32 {
+    let input = include_str!("../inputs/day09.txt");
+
+    return run2(input);
+}
+
+fn run1(input:&str) -> u32 {
+    let (score, _) = run(input);
+    return score;
+}
+
+fn run2(input:&str) -> u32 {
+    let (_, count) = run(input);
+    return count;
+}
+
+fn run(line:&str) -> (u32, u32) {
     let mut depth:u32 = 0;
     let mut score:u32 = 0;
     let mut in_garbage:bool = false;
@@ -42,16 +98,5 @@ fn calc_score(line: String) {
         }
     }
 
-    println!("Part 1: {:?}", score);
-    println!("Part 2: {:?}", garbage_count);
-}
-
-fn main() {
-    let f = File::open("input.txt").expect("no file?");
-    let mut reader = BufReader::new(f);
-
-    let mut line:String = String::new();
-    reader.read_line(&mut line).expect("failed to read line");
-
-    calc_score(line);
+    return (score, garbage_count);
 }
