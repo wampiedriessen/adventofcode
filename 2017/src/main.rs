@@ -7,7 +7,7 @@ mod day02;
 mod day03;
 mod day04;
 mod day05;
-// mod day06;
+mod day06;
 // mod day07;
 // mod day08;
 // mod day09;
@@ -71,8 +71,8 @@ fn run(day:u32, part:u32) {
 		(04, 2) => println!("{}", day04::part2()),
 		(05, 1) => println!("{}", day05::part1()),
 		(05, 2) => println!("{}", day05::part2()),
-		// (06, 1) => println!("{}", day06::part1()),
-		// (06, 2) => println!("{}", day06::part2()),
+		(06, 1) => println!("{}", day06::part1()),
+		(06, 2) => println!("{}", day06::part2()),
 		// (07, 1) => println!("{}", day07::part1()),
 		// (07, 2) => println!("{}", day07::part2()),
 		// (08, 1) => println!("{}", day08::part1()),
