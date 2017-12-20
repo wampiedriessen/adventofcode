@@ -5,6 +5,11 @@ mod tests {
   use super::*;
 
   #[test]
+  fn part1_sample_test() {
+    assert_eq!(12, run1("3,4,1,5", 5));
+  }
+
+  #[test]
   fn part2_sample_test() {
     assert_eq!("a2582a3a0e66e6e86e3812dcb672a272", run2(""));
     assert_eq!("33efeb34ea91902bb2f59c9920caa6cd", run2("AoC 2017"));
@@ -26,7 +31,7 @@ mod tests {
 pub fn part1() -> u32 {
     let input = include_str!("../inputs/day10.txt").trim();
 
-    return run1(input);
+    return run1(input, 256);
 }
 
 pub fn part2() -> String {
@@ -35,21 +40,13 @@ pub fn part2() -> String {
     return run2(input);
 }
 
-fn generate_empty_hash() -> [u8;256] {
-    let mut hash:[u8;256] = [0;256];
-    for i in 0..256 {
-        hash[i] = i as u8;
-    }
-    return hash
-}
-
-fn run1(input: &str) -> u32 {
-    let mut list: [u8; 256] = generate_empty_hash();
+fn run1(input: &str, len:u16) -> u32 {
+    let mut list: Vec<u8> = gen_hash_list(len);
     let mut index:u8 = 0;
     let mut skipsize:u8 = 0;
 
     for length in input.split(",") {
-        let len = length.parse::<u8>().unwrap();
+        let len = length.parse().unwrap();
 
         hash_step(&mut list, &mut index, &mut skipsize, len);
     }
@@ -58,7 +55,7 @@ fn run1(input: &str) -> u32 {
 }
 
 fn run2(input: &str) -> String {
-    let mut list: [u8; 256] = generate_empty_hash();
+    let mut list:Vec<u8> = gen_hash_list(256);
     let mut index:u8 = 0;
     let mut skipsize:u8 = 0;
 
@@ -69,7 +66,7 @@ fn run2(input: &str) -> String {
     bytes.push(47);
     bytes.push(23);
 
-    for _i in 0..64 {
+    for _ in 0..64 {
         for len in &bytes {
             hash_step(&mut list, &mut index, &mut skipsize, *len);
         }
@@ -83,21 +80,25 @@ fn run2(input: &str) -> String {
     return hash;
 }
 
-fn hash_step(v: &mut [u8; 256], index:&mut u8, skipsize:&mut u8, len: u8) {
+fn gen_hash_list(len:u16) -> Vec<u8> {
+    let prelist: Vec<u16> = (0..len).collect();
+    let list: Vec<u8> = prelist.iter().map(|&x| x as u8).collect();
+    return list;
+}
+
+fn hash_step(v: &mut Vec<u8>, index:&mut u8, skipsize:&mut u8, len: u8) {
     let start = index.clone();
     for i in 0..(len / 2) {
-        let a = start.wrapping_add(i);
-        let b = start.wrapping_add(len).wrapping_sub(i).wrapping_sub(1);
-        let tmp = v[a as usize];
-        v[a as usize] = v[b as usize];
-        v[b as usize] = tmp;
+        let a = start.wrapping_add(i) as usize % v.len();
+        let b = start.wrapping_add(len).wrapping_sub(i).wrapping_sub(1) as usize % v.len();
+        v.swap(a,b);
     }
 
     *index = index.wrapping_add(len.clone()).wrapping_add(*skipsize);
     *skipsize = skipsize.wrapping_add(1);
 }
 
-fn dense_hash(v: &[u8;256]) -> [u8; 16] {
+fn dense_hash(v: &Vec<u8>) -> [u8; 16] {
     let mut hash:[u8; 16] = [0; 16];
 
     for i in 0..16 {
