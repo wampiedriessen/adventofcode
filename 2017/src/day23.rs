@@ -15,11 +15,10 @@ pub fn part2() -> i64 {
 
 fn run1(input:&str) -> i32{
 	let mut regs:HashMap<char, i64> = HashMap::new();
-	let mut ops:Vec<&str> = input.split("\n").collect();
-	ops.push("end");
-	let mut index:i64 = 0;
+	let ops:Vec<&str> = input.split("\n").collect();
+	let mut index:usize = 0;
 	let mut multiplied = 0;
-	loop {
+	while index >= 0 && index < ops.len() {
 		let op = ops[index as usize];
 		let args:Vec<&str> = op.split_whitespace().collect();
 		match args[0] {
@@ -29,11 +28,11 @@ fn run1(input:&str) -> i32{
 			},
 			"jnz" => {
 				if day18::get_int(&mut regs, args[1]) != 0 {
-					index += day18::get_int(&mut regs, args[2]);
+					let jump = day18::get_int(&mut regs, args[2]);
+					index = ((index as i64) + jump) as usize;
 					continue;
 				}
 			},
-			"end" => break,
 			_ => day18::compute(&mut regs, args)
 		}
 		index += 1;
