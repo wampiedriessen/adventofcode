@@ -6,7 +6,7 @@ mod tests {
 
   #[test]
   fn part1_sample_test() {
-      	let ops = "set a 1
+		let ops = "set a 1
 add a 2
 mul a a
 mod a 5
@@ -16,29 +16,29 @@ rcv a
 jgz a -1
 set a 1
 jgz a -2";
-    assert_eq!(4, run1(ops.to_string()));
+	assert_eq!(4, run1(ops.to_string()));
   }
 
   #[test]
   fn part2_sample_test() {
-  	let ops = "snd 1
+	let ops = "snd 1
 snd 2
 snd p
 rcv a
 rcv b
 rcv c
 rcv d";
-    assert_eq!(3, run2(ops.to_string()));
+	assert_eq!(3, run2(ops.to_string()));
   }
 
   #[test]
   fn part1_test() {
-    assert_eq!(2951, part1());
+	assert_eq!(2951, part1());
   }
 
   #[test]
   fn part2_test() {
-    assert_eq!(7366, part2());
+	assert_eq!(7366, part2());
   }
 }
 
@@ -134,30 +134,34 @@ fn run2(input:String) -> i64 {
 	return p1counter;
 }
 
-fn compute(regs:&mut HashMap<char, i64>, args:Vec<&str>) {
+pub fn compute(regs:&mut HashMap<char, i64>, args:Vec<&str>) {
 	let x = args[1].chars().next().unwrap();
 	let y = get_int(regs, args[2]);
 	match args[0] {
-	    "set" => {
-	    	regs.insert(x, y);
-	    },
-	    "add" => {
-	    	let v = regs.entry(x).or_insert(0);
-	    	*v += y;
-	    },
-	    "mul" => {
-	    	let v = regs.entry(x).or_insert(0);
-	    	*v *= y;
-	    },
-	    "mod" => {
-	    	let v = regs.entry(x).or_insert(0);
-	    	*v = *v % y;
-	    },
-	    _ => panic!("no such op"),
+		"set" => {
+			regs.insert(x, y);
+		},
+		"add" => {
+			let v = regs.entry(x).or_insert(0);
+			*v += y;
+		},
+		"sub" => {
+			let v = regs.entry(x).or_insert(0);
+			*v -= y;
+		},
+		"mul" => {
+			let v = regs.entry(x).or_insert(0);
+			*v *= y;
+		},
+		"mod" => {
+			let v = regs.entry(x).or_insert(0);
+			*v = *v % y;
+		},
+		_ => panic!("no such op"),
 	}
 }
 
-fn get_int(regs:&mut HashMap<char, i64>, arg:&str) -> i64 {
+pub fn get_int(regs:&mut HashMap<char, i64>, arg:&str) -> i64 {
 	match arg.parse::<i64>() {
 		Ok(val) => return val,
 		Err(_) => return *regs.entry(arg.chars().next().unwrap()).or_insert(0)
