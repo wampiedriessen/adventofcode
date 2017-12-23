@@ -1,39 +1,146 @@
 use std::collections::HashMap;
 
-pub fn part1() -> i32{
-	let input = include_str!("../inputs/day21.txt");
+pub fn part1() -> i32 {
+let input = include_str!("../inputs/day21.txt");
 
-	let lut = parse_input(input);
+let lut = parse_input(input);
 
-	println!("{:?}", lut.keys().len());
+println!("{:?}", lut.keys().len());
 
-	return run1(&lut);
+return run1(&lut);
 }
 
-pub fn part2() -> i32{
-	let input = include_str!("../inputs/day21.txt");
+pub fn part2() -> i32 {
+let input = include_str!("../inputs/day21.txt");
 
-	let lut = parse_input(input);
+let lut = parse_input(input);
 
-	return run2(&lut);
+return run2(&lut);
 }
 
 fn run1(lut:&HashMap<String,String>) -> i32 {
 	let mut grid = ".#./..#/###".to_string();
 
 	for _ in 0..5 {
-		grid = grow(grid);
+		grid = grow(&lut, grid);
 	}
 
-	return grid.len() as i32;
+	return count_pixels(grid);
 }
 
 fn run2(lut:&HashMap<String,String>) -> i32 {
-	0
+	let mut grid = ".#./..#/###".to_string();
+
+	for _ in 0..18 {
+		grid = grow(&lut, grid);
+	}
+
+	return count_pixels(grid);
 }
 
-fn grow(grid:String) -> String {
+fn count_pixels(grid:String) -> i32 {
+	let mut count = 0;
+	for kar in grid.chars() {
+		if kar == '#' {
+			count += 1;
+		}
+	}
+	count
+}
+
+fn grow(lut:&HashMap<String,String>, grid:String) -> String {
+	if grid.len() <= 11 {
+		return lut.get(&grid).unwrap().clone();
+	}
+
+	let dots = grid.replace('/',"");
+
+	if dots.len() % 2 == 0 {
+		return split_grow_2(&lut, grid);
+	}
+
+	if dots.len() % 3 == 0 {
+		return split_grow_3(&lut, grid);
+	}
+
 	"".to_string()
+}
+
+fn split_grow_2(lut:&HashMap<String,String>, grid:String) -> String {
+	let lines:Vec<&str> = grid.split("/").collect();
+	let len = lines.len();
+
+	let mut subgrids:Vec<String> = Vec::new();
+
+	for i in step_range(0, len, 2) {
+		for j in step_range(0, len, 2) {
+			let mut subgrid:String = lines[i][j..j+2].to_string();
+			subgrid.push('/');
+			subgrid.push_str(&lines[i+1][j..j+2]);
+			subgrids.push(grow(&lut, subgrid));
+		}
+	}
+
+	// subgrids have grown
+
+	let mut newgrid:String = String::new();
+
+	for i in 0..len/2 {
+		let mut lines:[String; 3] = ["".to_string(),"".to_string(),"".to_string()];
+		for j in 0..len/2 {
+			let grlines:Vec<&str> = subgrids[i*len/2 + j].split("/").collect();
+			lines[0].push_str(grlines[0].clone());
+			lines[1].push_str(grlines[1].clone());
+			lines[2].push_str(grlines[2].clone());
+		}
+		for line in lines.iter() {
+			newgrid += &line.clone();
+			newgrid.push('/');
+		}
+	}
+
+	newgrid.pop();
+	newgrid
+}
+
+fn split_grow_3(lut:&HashMap<String,String>, grid:String) -> String {
+	let lines:Vec<&str> = grid.split("/").collect();
+	let len = lines.len();
+
+	let mut subgrids:Vec<String> = Vec::new();
+
+	for i in step_range(0, len, 3) {
+		for j in step_range(0, len, 3) {
+			let mut subgrid:String = lines[i][j..j+3].to_string();
+			subgrid.push('/');
+			subgrid.push_str(&lines[i+1][j..j+3]);
+			subgrid.push('/');
+			subgrid.push_str(&lines[i+2][j..j+3]);
+			subgrids.push(grow(&lut, subgrid));
+		}
+	}
+
+	// subgrids have grown
+
+	let mut newgrid:String = String::new();
+
+	for i in 0..len/3 {
+		let mut lines:[String; 4] = ["".to_string(),"".to_string(),"".to_string(),"".to_string()];
+		for j in 0..len/3 {
+			let grlines:Vec<&str> = subgrids[i*len/3 + j].split("/").collect();
+			lines[0].push_str(grlines[0].clone());
+			lines[1].push_str(grlines[1].clone());
+			lines[2].push_str(grlines[2].clone());
+			lines[3].push_str(grlines[3].clone());
+		}
+		for line in lines.iter() {
+			newgrid += &line.clone();
+			newgrid.push('/');
+		}
+	}
+
+	newgrid.pop();
+	newgrid
 }
 
 fn parse_input(input:&str) -> HashMap<String,String> {
@@ -115,6 +222,17 @@ fn possibilities(input:&str) -> Vec<String> {
 			inp.insert(7, '/');
 		}
 		out.push(inp.clone());
+	}
+	out
+}
+
+fn step_range(start:usize, end:usize, stepsize:usize) -> Vec<usize> {
+	let mut out:Vec<usize> = Vec::new();
+	let mut i = 0;
+	while i*stepsize < end - start {
+		out.push(start+i*stepsize);
+
+		i += 1;
 	}
 	out
 }
