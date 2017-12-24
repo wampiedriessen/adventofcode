@@ -1,6 +1,32 @@
 use day18;
 use std::collections::HashMap;
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn part1_sample_test() {
+        // nothing provided
+    }
+
+    #[test]
+    fn part2_sample_test() {
+        // nothing provided
+    }
+
+    #[test]
+    fn part1_test() {
+        assert_eq!(6724, part1());
+    }
+
+    #[test]
+    fn part2_test() {
+        assert_eq!(903, part2());
+    }
+}
+
+
 pub fn part1() -> i32 {
 	let input = include_str!("../inputs/day23.txt");
 
