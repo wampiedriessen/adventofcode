@@ -1,20 +1,53 @@
 use std::collections::HashMap;
-use std::io::prelude::*;
-use std::io::BufReader;
-use std::fs::File;
 
-fn is_unseen(scanners: &HashMap<i32, i32>, delay: i32) -> bool {
-    for index in scanners.keys() {
-        let range = scanners.get(index).unwrap();
+#[cfg(test)]
+mod tests {
+  use super::*;
 
-        if (delay+index) % ((range-1)*2) == 0 {
-            return false;
-        }
-    }
-    return true;
+  #[test]
+  fn part1_sample_test() {
+    let sample_input = "0: 3
+1: 2
+4: 4
+6: 4";
+
+    assert_eq!(24, run1(parse_input(sample_input)));
+  }
+
+  #[test]
+  fn part2_sample_test() {
+    let sample_input = "0: 3
+1: 2
+4: 4
+6: 4";
+
+    assert_eq!(10, run2(parse_input(sample_input)));
+  }
+
+  #[test]
+  fn part1_test() {
+    assert_eq!(1504, part1());
+  }
+
+  #[test]
+  fn part2_test() {
+    assert_eq!(3823370, part2());
+  }
 }
 
-fn calc_severity(scanners: &HashMap<i32, i32>) -> i32 {
+pub fn part1() -> i32 {
+    let input = include_str!("../inputs/day13.txt");
+
+    run1(parse_input(input))
+}
+
+pub fn part2() -> i32 {
+    let input = include_str!("../inputs/day13.txt");
+
+    run2(parse_input(input))
+}
+
+fn run1(scanners:HashMap<i32, i32>) -> i32 {
     let mut severity = 0;
     for index in scanners.keys() {
         let range = scanners.get(index).unwrap();
@@ -26,12 +59,29 @@ fn calc_severity(scanners: &HashMap<i32, i32>) -> i32 {
     return severity;
 }
 
-fn main() {
-    let f = File::open("input.txt").expect("no file?");
-    let reader = BufReader::new(f);
+fn run2(scanners:HashMap<i32, i32>) -> i32 {
+    let mut delay = 0;
 
-    let lines:Vec<String> = reader.lines()
-        .map(|l| l.expect("Could not parse line"))
+    let mut unseen:bool = false;
+    while !unseen {
+        unseen = true;
+        for index in scanners.keys() {
+            let range = scanners.get(index).unwrap();
+
+            if (delay+index) % ((range-1)*2) == 0 {
+                unseen = false;
+                break;
+            }
+        }
+        delay += 1;
+    }
+    
+    delay-1
+}
+
+fn parse_input(input:&str) -> HashMap<i32, i32> {
+    let lines:Vec<&str> = input
+        .split("\n")
         .collect();
 
     let mut scanners:HashMap<i32, i32> = HashMap::new();
@@ -43,15 +93,5 @@ fn main() {
 
         scanners.insert(index, range);
     }
-
-    let severity = calc_severity(&scanners);
-    let mut delay = 0;
-
-    println!("Part 1: {:?}", severity);
-
-    while !is_unseen(&scanners, delay) {
-        delay += 1;
-    }
-
-    println!("Part 2: {:?}", delay);
+    scanners
 }
