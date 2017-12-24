@@ -1,36 +1,36 @@
+
 #[cfg(test)]
 mod tests {
 	use super::*;
 
 	#[test]
 	fn part1_sample_test() {
-		let example1 = "p=<3,0,0>, v=<2,0,0>, a=<-1,0,0>
-p=<4,0,0>, v=<0,0,0>, a=<-2,0,0>";
+		let example_input = "..#
+#..
+...".to_string();
 
-		assert_eq!(0, run1(example1.to_string()));
+		assert_eq!(5587, run1(example_input));
 	}
 
 	#[test]
 	fn part2_sample_test() {
-		let example2 = "p=<-6,0,0>, v=<3,0,0>, a=<0,0,0>
-p=<-4,0,0>, v=<2,0,0>, a=<0,0,0>
-p=<-2,0,0>, v=<1,0,0>, a=<0,0,0>
-p=<3,0,0>, v=<-1,0,0>, a=<0,0,0>";
+		let example_input = "..#
+#..
+...".to_string();
 
-		assert_eq!(1, run2(example2.to_string()));
+		assert_eq!(2511944, run2(example_input));
 	}
 
 	#[test]
 	fn part1_test() {
-		assert_eq!(91, part1());
+		assert_eq!(5261, part1());
 	}
 
 	#[test]
 	fn part2_test() {
-		assert_eq!(567, part2());
+		assert_eq!(2511927, part2());
 	}
 }
-
 pub fn part1() -> u32 {
 	let input = include_str!("../inputs/day22.txt");
 

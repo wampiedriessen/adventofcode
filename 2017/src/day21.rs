@@ -1,38 +1,54 @@
 use std::collections::HashMap;
 
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn part1_sample_test() {
+		let example_input = "../.# => ##./#../...
+.#./..#/### => #..#/..../..../#..#";
+
+		let mut lut = parse_input(example_input);
+
+		assert_eq!(12, run(&mut lut, 2));
+	}
+
+	#[test]
+	fn part2_sample_test() {
+		// part1_sample_test();
+	}
+
+	#[test]
+	fn part1_test() {
+		assert_eq!(197, part1());
+	}
+
+	#[test]
+	fn part2_test() {
+		assert_eq!(3081737, part2());
+	}
+}
+
 pub fn part1() -> i32 {
-let input = include_str!("../inputs/day21.txt");
+	let input = include_str!("../inputs/day21.txt");
 
-let lut = parse_input(input);
-
-println!("{:?}", lut.keys().len());
-
-return run1(&lut);
+	let mut lut = parse_input(input);
+	return run(&mut lut, 5);
 }
 
 pub fn part2() -> i32 {
-let input = include_str!("../inputs/day21.txt");
+	let input = include_str!("../inputs/day21.txt");
 
-let lut = parse_input(input);
-
-return run2(&lut);
+	let mut lut = parse_input(input);
+	return run(&mut lut, 18);
 }
 
-fn run1(lut:&HashMap<String,String>) -> i32 {
+fn run(mut lut:&mut HashMap<String,String>, iterations:usize) -> i32 {
 	let mut grid = ".#./..#/###".to_string();
 
-	for _ in 0..5 {
-		grid = grow(&lut, grid);
-	}
-
-	return count_pixels(grid);
-}
-
-fn run2(lut:&HashMap<String,String>) -> i32 {
-	let mut grid = ".#./..#/###".to_string();
-
-	for _ in 0..18 {
-		grid = grow(&lut, grid);
+	for _ in 0..iterations {
+		grid = grow(&mut lut, grid);
 	}
 
 	return count_pixels(grid);
@@ -48,25 +64,28 @@ fn count_pixels(grid:String) -> i32 {
 	count
 }
 
-fn grow(lut:&HashMap<String,String>, grid:String) -> String {
-	if grid.len() <= 11 {
+fn grow(mut lut:&mut HashMap<String,String>, grid:String) -> String {
+
+	if lut.contains_key(&grid) {
 		return lut.get(&grid).unwrap().clone();
 	}
 
 	let dots = grid.replace('/',"");
+	let newgrid;
 
 	if dots.len() % 2 == 0 {
-		return split_grow_2(&lut, grid);
+		newgrid = split_grow_2(&mut lut, grid.clone());
+	} else if dots.len() % 3 == 0 {
+		newgrid = split_grow_3(&mut lut, grid.clone());
+	} else {
+		panic!("What do I do now??");
 	}
 
-	if dots.len() % 3 == 0 {
-		return split_grow_3(&lut, grid);
-	}
-
-	"".to_string()
+	lut.insert(grid.clone(), newgrid.clone());
+	newgrid
 }
 
-fn split_grow_2(lut:&HashMap<String,String>, grid:String) -> String {
+fn split_grow_2(mut lut:&mut HashMap<String,String>, grid:String) -> String {
 	let lines:Vec<&str> = grid.split("/").collect();
 	let len = lines.len();
 
@@ -77,7 +96,7 @@ fn split_grow_2(lut:&HashMap<String,String>, grid:String) -> String {
 			let mut subgrid:String = lines[i][j..j+2].to_string();
 			subgrid.push('/');
 			subgrid.push_str(&lines[i+1][j..j+2]);
-			subgrids.push(grow(&lut, subgrid));
+			subgrids.push(grow(&mut lut, subgrid));
 		}
 	}
 
@@ -103,7 +122,7 @@ fn split_grow_2(lut:&HashMap<String,String>, grid:String) -> String {
 	newgrid
 }
 
-fn split_grow_3(lut:&HashMap<String,String>, grid:String) -> String {
+fn split_grow_3(mut lut:&mut HashMap<String,String>, grid:String) -> String {
 	let lines:Vec<&str> = grid.split("/").collect();
 	let len = lines.len();
 
@@ -116,7 +135,7 @@ fn split_grow_3(lut:&HashMap<String,String>, grid:String) -> String {
 			subgrid.push_str(&lines[i+1][j..j+3]);
 			subgrid.push('/');
 			subgrid.push_str(&lines[i+2][j..j+3]);
-			subgrids.push(grow(&lut, subgrid));
+			subgrids.push(grow(&mut lut, subgrid));
 		}
 	}
 
