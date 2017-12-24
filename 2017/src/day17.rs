@@ -23,7 +23,6 @@ mod tests {
   }
 }
 
-
 pub fn part1() -> u32 {
 	let input = include_str!("../inputs/day17.txt");
 

@@ -1,4 +1,45 @@
-#[derive(Clone)]
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn part1_sample_test() {
+  	let sample_input = "0/2
+2/2
+2/3
+3/4
+3/5
+0/1
+10/1
+9/10";
+
+    assert_eq!(31, run1(parse_input(sample_input)));
+  }
+
+  #[test]
+  fn part2_sample_test() {
+  	let sample_input = "0/2
+2/2
+2/3
+3/4
+3/5
+0/1
+10/1
+9/10";
+    assert_eq!(19, run2(parse_input(sample_input)));
+  }
+
+  #[test]
+  fn part1_test() {
+    assert_eq!(1859, part1());
+  }
+
+  #[test]
+  fn part2_test() {
+    assert_eq!(1799, part2());
+  }
+}
+
 struct Component {
 	id:i32,
 	conn1:i32,
