@@ -27,6 +27,7 @@ mod day21;
 mod day22;
 mod day23;
 mod day24;
+mod day25;
 
 use std::env;
 use std::process::exit;
@@ -114,6 +115,8 @@ fn run(day:u32, part:u32) {
 		(23, 3) => println!("{}", day23::run2_unoptimized()),
 		(24, 1) => println!("{}", day24::part1()),
 		(24, 2) => println!("{}", day24::part2()),
+		(25, 1) => println!("{}", day25::part1()),
+		(25, 2) => println!("{}", day25::part2()),
 
 
 		(201518, 1) => println!("{}", day182015::part1()),
