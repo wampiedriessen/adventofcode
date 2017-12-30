@@ -1,23 +1,29 @@
-const SAMPLE_INPUT:&str = "     |          
-     |  +--+    
-     A  |  C    
- F---|--|-E---+ 
-     |  |  |  D 
-     +B-+  +--+ 
-";
-
 #[cfg(test)]
 mod tests {
   use super::*;
 
   #[test]
   fn part1_sample_test() {
-    assert_eq!("ABCDEF", run1(SAMPLE_INPUT.to_string()));
+    let sample_input:String = "     |          
+     |  +--+    
+     A  |  C    
+ F---|--|-E---+ 
+     |  |  |  D 
+     +B-+  +--+ 
+".to_string();
+    assert_eq!("ABCDEF", run1(sample_input.to_string()));
   }
 
   #[test]
   fn part2_sample_test() {
-    assert_eq!(38, run2(SAMPLE_INPUT.to_string()));
+        let sample_input:String = "     |          
+     |  +--+    
+     A  |  C    
+ F---|--|-E---+ 
+     |  |  |  D 
+     +B-+  +--+ 
+".to_string();
+    assert_eq!(38, run2(sample_input.to_string()));
   }
 
   #[test]

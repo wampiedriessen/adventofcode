@@ -58,12 +58,12 @@ pub fn part2() -> i32 {
 	run2(parse_input(input))
 }
 
-fn run1(mut components:Vec<Component>) -> i32 {
+fn run1(components:Vec<Component>) -> i32 {
 	find_max(&components, vec![], 0)
 }
 
 fn run2(components:Vec<Component>) -> i32 {
-	let (len, max) = find_max_len(&components, vec![], 0, 0);
+	let (_, max) = find_max_len(&components, vec![], 0, 0);
 	max
 }
 

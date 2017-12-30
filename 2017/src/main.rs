@@ -112,7 +112,6 @@ fn run(day:u32, part:u32) {
 		(22, 2) => println!("{}", day22::part2()),
 		(23, 1) => println!("{}", day23::part1()),
 		(23, 2) => println!("{}", day23::part2()),
-		(23, 3) => println!("{}", day23::run2_unoptimized()),
 		(24, 1) => println!("{}", day24::part1()),
 		(24, 2) => println!("{}", day24::part2()),
 		(25, 1) => println!("{}", day25::part1()),
