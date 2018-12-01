@@ -4,36 +4,44 @@ module Solutions.Day1
 ) where
 
 import CommonHelpers
+import qualified Data.Set as Set
 
-followers :: [Int] -> [Int]
-followers [] = []
-followers (x:[]) = []
-followers (x:y:xs) = if x == y
-    then x:followers (y:xs)
-    else followers (y:xs)
+sanitize :: String -> Int
+sanitize x =
+    let
+        repl '+' = ' '
+        repl  c   = c
+    in read (map repl x) :: Int
 
-allfollowers :: [Int] -> [Int]
-allfollowers [] = []
-allfollowers (x:[]) = []
-allfollowers (x:xs) = if x == (last xs)
-    then x:(followers (x:xs))
-    else followers (x:xs)
-
-solveP1 :: [Int] -> Int
-solveP1 = sum . allfollowers
+solveP1 :: [String] -> String
+solveP1 = show . sum . map sanitize
 
 -- || Start Part 2
 
-allbalanced :: [Int] -> [Int] -> [Int]
-allbalanced _ [] = []
-allbalanced [] _ = []
-allbalanced (x:xs) (y:ys) = if x == y
-    then (2*x):(allbalanced xs ys)
-    else allbalanced xs ys
+-- hasDuplicates [] = False
+-- hasDuplicates (x:xs) = x `elem` xs || hasDuplicates xs
 
--- allbalanced :: (Num a, Eq a) => [a] -> [a] -> [a]
--- allbalanced = zipWith (\a0 b0 -> if a0 == b0 then 2*a0 else 0)
+-- hasDuplicateFrequency :: [Int] -> Bool
+-- hasDuplicateFrequency [] = False
+-- hasDuplicateFrequency (x:xs) = hasDuplicates (x:xs) || hasDuplicateFrequency xs
 
-solveP2 :: [Int] -> Int
+-- solveP2Recurse :: Set.Set -> [Int] -> Int
+solveP2Recurse seen (x:freqs) =
+    if (Set.member x seen)
+    then
+        x
+    else
+        solveP2Recurse (Set.insert x seen) freqs
+
+solveP2 :: [String] -> String
 solveP2 x =
-    let s = splitInHalf x in sum (allbalanced (fst s) (snd s))
+    let
+        freqs = scanl (+) 0 $ cycle $ map sanitize x
+    in show $ solveP2Recurse Set.empty freqs
+
+
+    -- in show $ f !! (head $ dropWhile (not . hasDuplicates . fst . flip splitAt f) [1..])
+    -- in show $ fst $ splitAt 2048 f
+    -- in show f
+    -- in show $ f !! ( dropWhile () [1..])
+    --in show [1..]

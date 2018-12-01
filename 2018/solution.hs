@@ -1,4 +1,4 @@
-import Solutions.Day13
+import Solutions.Day1
 import System.IO
 
 import CommonHelpers
