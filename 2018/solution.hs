@@ -1,4 +1,4 @@
-import Solutions.Day1
+import Solutions.Day2
 import System.IO
 
 import CommonHelpers
@@ -8,7 +8,7 @@ main = do
     -- input <- readFile "Inputs/day1.txt"
     let problem = lines input
     putStr "\n"
-    putStr $ solveP1 problem
+    putStr $ "Deel 1: " ++ solveP1 problem
     putStr "\n"
-    putStr $ solveP2 problem
+    putStr $ "Deel 2: " ++ solveP2 problem
     putStr "\n"

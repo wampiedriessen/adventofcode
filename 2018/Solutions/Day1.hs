@@ -18,14 +18,7 @@ solveP1 = show . sum . map sanitize
 
 -- || Start Part 2
 
--- hasDuplicates [] = False
--- hasDuplicates (x:xs) = x `elem` xs || hasDuplicates xs
-
--- hasDuplicateFrequency :: [Int] -> Bool
--- hasDuplicateFrequency [] = False
--- hasDuplicateFrequency (x:xs) = hasDuplicates (x:xs) || hasDuplicateFrequency xs
-
--- solveP2Recurse :: Set.Set -> [Int] -> Int
+solveP2Recurse :: Ord a => Set.Set a -> [a] -> a
 solveP2Recurse seen (x:freqs) =
     if (Set.member x seen)
     then
@@ -35,13 +28,5 @@ solveP2Recurse seen (x:freqs) =
 
 solveP2 :: [String] -> String
 solveP2 x =
-    let
-        freqs = scanl (+) 0 $ cycle $ map sanitize x
+    let freqs = scanl (+) 0 $ cycle $ map sanitize x
     in show $ solveP2Recurse Set.empty freqs
-
-
-    -- in show $ f !! (head $ dropWhile (not . hasDuplicates . fst . flip splitAt f) [1..])
-    -- in show $ fst $ splitAt 2048 f
-    -- in show f
-    -- in show $ f !! ( dropWhile () [1..])
-    --in show [1..]
