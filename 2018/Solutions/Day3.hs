@@ -1,10 +1,11 @@
 module Solutions.Day3
-( solveP1
-, solveP2
+( solvers
 ) where
 
 import CommonHelpers
 import qualified Data.List as L
+
+solvers = [solveP1,solveP2]
 
 -- #1 @ 1,3: 4x4
 -- left,top,width,height

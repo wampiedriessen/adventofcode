@@ -1,10 +1,11 @@
 module Solutions.Day2
-( solveP1
-, solveP2
+( solvers
 ) where
 
 import CommonHelpers
 import qualified Data.List as L
+
+solvers = [solveP1,solveP2]
 
 hasTwo :: String -> Bool
 hasTwo = not . L.null . filter ((2 ==) . length) . L.group . L.sort

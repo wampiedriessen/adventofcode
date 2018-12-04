@@ -1,12 +1,13 @@
 module Solutions.Day4
-( solveP1
-, solveP2
+( solvers
 ) where
 
 import CommonHelpers
 import qualified Data.List as L
 import qualified Data.Set as S
 import Data.Function (on)
+
+solvers = [solveP1,solveP2]
 
 parseDate :: String -> Integer
 parseDate x =

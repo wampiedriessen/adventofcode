@@ -1,10 +1,11 @@
 module Solutions.Day1
-( solveP1
-, solveP2
+( solvers
 ) where
 
 import CommonHelpers
 import qualified Data.Set as Set
+
+solvers = [solveP1,solveP2]
 
 sanitize :: String -> Int
 sanitize x =

@@ -1,13 +1,32 @@
-import Solutions.Day2
+import qualified Solutions.Day1 as D1
+import qualified Solutions.Day2 as D2
+import qualified Solutions.Day3 as D3
+import qualified Solutions.Day4 as D4
 
 import System.CPUTime
+import System.Environment
 import System.IO
 import Text.Printf
 
 import CommonHelpers
 
+solutions = [D1.solvers, D2.solvers, D3.solvers, D4.solvers]
+
 main = do
-    input <- getContents
+
+    args <- getArgs
+
+    let pNr = head args
+    let isTest = length args == 2
+    let iType = if isTest then "test" else "d"
+    let fileName = "Inputs/" ++ iType ++ pNr ++ ".txt"
+
+    handle <- openFile fileName ReadMode
+    input <- hGetContents handle
+
+    let solveP1 = (solutions !! (read pNr - 1)) !! 0;
+    let solveP2 = (solutions !! (read pNr - 1)) !! 1;
+
     let problem = lines input
 
     putStr "\n"
