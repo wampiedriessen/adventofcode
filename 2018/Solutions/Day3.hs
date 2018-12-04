@@ -29,7 +29,7 @@ solveP1 = show . length . filterSingles . createGridItems
 -- || Start Part 2
 
 solveP2 :: [String] -> String
-solveP2 x = 
+solveP2 x =
     let
         gridItems = L.sort $ concat $ map (snd . parse) x
         isSingleInList grid x = 1 == (length $ filter (x==) grid)
