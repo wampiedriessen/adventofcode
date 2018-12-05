@@ -25,6 +25,7 @@ import qualified Solutions.Day24 as D24
 import qualified Solutions.Day25 as D25
 
 import System.CPUTime
+import System.Directory
 import System.Environment
 import System.IO
 import Text.Printf
@@ -33,37 +34,54 @@ import CommonHelpers
 
 solutions = [D01.solvers, D02.solvers, D03.solvers, D04.solvers, D05.solvers, D06.solvers, D07.solvers, D08.solvers, D09.solvers, D10.solvers, D11.solvers, D12.solvers, D13.solvers, D14.solvers, D15.solvers, D16.solvers, D17.solvers, D18.solvers, D19.solvers, D20.solvers, D21.solvers, D22.solvers, D23.solvers, D24.solvers, D25.solvers]
 
-main = do
+performCalculations :: Bool -> Int -> IO ()
+performCalculations isTest pNr = do
+    let iType = if isTest then "test" else "d"
+        fileName = "Inputs/" ++ iType ++ (show pNr) ++ ".txt"
 
+    putStr $ "Day " ++ (show pNr)
+    putStr "\n"
+
+    fileExists <- doesFileExist fileName
+
+    if not fileExists then
+        putStr "Input does not exist"
+    else do
+        handle <- openFile fileName ReadMode
+        input <- hGetContents handle
+
+        let solveP1 = (solutions !! (pNr - 1)) !! 0;
+            solveP2 = (solutions !! (pNr - 1)) !! 1;
+            problem = lines input
+
+
+
+        start1 <- getCPUTime
+        putStr $ "Deel 1: " ++ solveP1 problem
+        end1 <- getCPUTime
+        putStr "\n"
+
+        start2 <- getCPUTime
+        putStr $ "Deel 2: " ++ solveP2 problem
+        end2 <- getCPUTime
+        putStr "\n"
+
+        let d1 = (fromIntegral (end1 - start1)) / (10^12)
+            d2 = (fromIntegral (end2 - start2)) / (10^12)
+
+        printf "Timings - 1: %0.3f sec, 2: %1.3f sec\n" (d1 :: Double) (d2 :: Double)
+        putStr "\n"
+
+main = do
     args <- getArgs
 
     let pNr = head args
     let isTest = length args == 2
-    let iType = if isTest then "test" else "d"
-    let fileName = "Inputs/" ++ iType ++ pNr ++ ".txt"
-
-    handle <- openFile fileName ReadMode
-    input <- hGetContents handle
-
-    let solveP1 = (solutions !! (read pNr - 1)) !! 0;
-    let solveP2 = (solutions !! (read pNr - 1)) !! 1;
-
-    let problem = lines input
 
     putStr "\n"
 
-    start1 <- getCPUTime
-    putStr $ "Deel 1: " ++ solveP1 problem
-    end1 <- getCPUTime
-    putStr "\n"
-
-    start2 <- getCPUTime
-    putStr $ "Deel 2: " ++ solveP2 problem
-    end2 <- getCPUTime
-    putStr "\n"
-
-    let d1 = (fromIntegral (end1 - start1)) / (10^12)
-    let d2 = (fromIntegral (end2 - start2)) / (10^12)
-
-    printf "Timings - 1: %0.3f sec, 2: %1.3f sec\n" (d1 :: Double) (d2 :: Double)
-    putStr "\n"
+    if pNr == "all" then
+        mapM (performCalculations isTest) [1..25]
+    else do
+        performCalculations isTest $ read pNr
+        return [()]
