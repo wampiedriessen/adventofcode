@@ -7,11 +7,11 @@ import qualified Data.List as L
 
 solvers = [solveP1,solveP2]
 
-hasTwo :: String -> Bool
-hasTwo = not . L.null . filter ((2 ==) . length) . L.group . L.sort
+hasTwo :: [[Char]] -> Bool
+hasTwo = any ((2 ==) . length)
 
-hasThree :: String -> Bool
-hasThree = not . L.null . filter ((3 ==) . length) . L.group . L.sort
+hasThree :: [[Char]] -> Bool
+hasThree = any ((3 ==) . length)
 
 recSolve1 [] = (0,0)
 recSolve1 (tag:tags) =
@@ -22,29 +22,22 @@ recSolve1 (tag:tags) =
     in (twos+plus2,threes+plus3)
 
 solveP1 :: [String] -> String
-solveP1 = show . uncurry (*) . recSolve1
+solveP1 = show . uncurry (*) . recSolve1 . map (L.group . L.sort)
 
 -- || Start Part 2
 
 createAllPairs :: [a] -> [(a, a)]
-createAllPairs [] = []
-createAllPairs [x] = []
-createAllPairs (x:xs) = foldl (\acc y -> (x,y):acc) [] xs ++ createAllPairs xs
-
-hasNoDiff :: Eq a => ([a], [a]) -> Bool
-hasNoDiff (_,[]) = True
-hasNoDiff ([],_) = True
-hasNoDiff (x:xs,y:ys) = if x /= y then False else hasNoDiff (xs,ys)
+createAllPairs l = [(x,y) | (x:ys) <- L.tails l, y <- ys]
 
 hasOneDiff :: Eq a => ([a], [a]) -> Bool
 hasOneDiff (_,[]) = False
 hasOneDiff ([],_) = False
-hasOneDiff (x:xs,y:ys) = if x /= y then hasNoDiff (xs,ys) else hasOneDiff (xs,ys)
+hasOneDiff (x:xs,y:ys) = if x /= y then xs == ys else hasOneDiff (xs,ys)
 
-removeUncompared :: Eq a => ([a], [a]) -> [a]
-removeUncompared (_,[]) = []
-removeUncompared ([],_) = []
-removeUncompared (x:xs,y:ys) = if x == y then x:(removeUncompared (xs,ys)) else removeUncompared (xs,ys)
+rmFirstAnomaly :: Eq a => ([a], [a]) -> [a]
+rmFirstAnomaly (_,[]) = []
+rmFirstAnomaly ([],_) = []
+rmFirstAnomaly (x:xs,y:ys) = if x == y then x:(rmFirstAnomaly (xs,ys)) else xs
 
 solveP2 :: [String] -> String
-solveP2 = removeUncompared . head . filter hasOneDiff . createAllPairs
+solveP2 = rmFirstAnomaly . head . filter hasOneDiff . createAllPairs

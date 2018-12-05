@@ -34,7 +34,7 @@ getGuardIds :: [String] -> [String]
 getGuardIds = map getGuardId . filter isGuardLine
 
 parseStates :: Integer -> String -> [String] -> [(String, Integer)]
-parseStates _ __ [] = []
+parseStates _ _ [] = []
 parseStates prevtime curGuard (newline:xs) =
     let
         newtime = parseDate newline
