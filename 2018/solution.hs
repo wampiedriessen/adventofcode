@@ -71,14 +71,18 @@ performCalculations isTest pNr = do
 
 main = do
     args <- getArgs
+    let argv = length args
 
-    let pNr = head args
-    let isTest = length args == 2
-
-    putStr "\n"
-
-    if pNr == "all" || pNr == "a" then
-        mapM (performCalculations isTest) [1..25]
+    if argv == 0 then do
+        putStrLn "Usage: ./solution ($daynr|'all') (?'test')"
     else do
-        performCalculations isTest $ read pNr
-        return [()]
+        let pNr = head args
+            isTest = argv == 2
+
+        putStr "\n"
+
+        if pNr == "all" || pNr == "a" then do
+            mapM (performCalculations isTest) [1..25]
+            return ()
+        else do
+            performCalculations isTest $ read pNr

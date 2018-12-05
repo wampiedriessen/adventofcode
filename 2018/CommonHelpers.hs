@@ -2,6 +2,7 @@ module CommonHelpers
 ( splitInHalf
 , getIntList
 , countOccurs
+, splitCommaSpaceDelimited
 ) where
 
 import qualified Data.Char as C

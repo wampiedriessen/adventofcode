@@ -23,14 +23,17 @@ parse claim =
 countSquaresClaimed :: (Ord a, Num b) => [a] -> M.Map a b
 countSquaresClaimed = M.fromListWith (\n1 n2 -> n1 + n2) . flip zip (cycle [1])
 
+coordinatesFromInput :: [(String,[(Int,Int)])] -> [(Int, Int)]
+coordinatesFromInput = concat . map snd
+
 solveP1 :: [String] -> String
-solveP1 = show . M.size . M.filter (>1) . countSquaresClaimed . concat . map (snd . parse)
+solveP1 = show . M.size . M.filter (>1) . countSquaresClaimed . coordinatesFromInput . map parse
 
 -- || Start Part 2
 
 solveP2 :: [String] -> String
 solveP2 x =
     let
-        claimLists = map parse x
-        doubleClaimedSquares = M.filter (>1) $ countSquaresClaimed $ concat $ map (snd . parse) x
-    in fst $ head $ filter (all (not . flip M.member doubleClaimedSquares) . snd) claimLists
+        input = map parse x
+        doubleClaimedSquares = M.filter (>1) $ countSquaresClaimed $ coordinatesFromInput input
+    in fst $ head $ filter (all (not . flip M.member doubleClaimedSquares) . snd) input
