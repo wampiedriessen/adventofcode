@@ -1,4 +1,4 @@
-module Solutions.Day5
+module Solutions.Day05
 ( solvers
 ) where
 
