@@ -24,7 +24,7 @@ import qualified Solutions.Day23 as D23
 import qualified Solutions.Day24 as D24
 import qualified Solutions.Day25 as D25
 
-import System.CPUTime
+import System.Clock
 import System.Directory
 import System.Environment
 import System.IO
@@ -56,18 +56,18 @@ performCalculations isTest pNr = do
             solveP2 = (solutions !! (pNr - 1)) !! 1;
             problem = lines input
 
-        start1 <- getCPUTime
+        start1 <- getTime Monotonic
         putStrLn $ "Deel 1: " ++ solveP1 problem
-        end1 <- getCPUTime
+        end1 <- getTime Monotonic
 
-        start2 <- getCPUTime
+        start2 <- getTime Monotonic
         putStrLn $ "Deel 2: " ++ solveP2 problem
-        end2 <- getCPUTime
+        end2 <- getTime Monotonic
 
-        let d1 = (fromIntegral (end1 - start1)) / (10^12)
-            d2 = (fromIntegral (end2 - start2)) / (10^12)
+        let d1 = (fromIntegral $ toNanoSecs $ diffTimeSpec start1 end1) / (10^9)
+            d2 = (fromIntegral $ toNanoSecs $ diffTimeSpec start2 end2) / (10^9)
 
-        printf "Timings - 1: %0.3f sec, 2: %1.3f sec\n" (d1 :: Double) (d2 :: Double)
+        printf "Timings - 1: %0.6f sec, 2: %1.6f sec\n" (d1 :: Double) (d2 :: Double)
         putStr "\n"
 
 main = do
