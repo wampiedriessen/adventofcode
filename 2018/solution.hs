@@ -39,14 +39,13 @@ performCalculations isTest pNr = do
     let iType = if isTest then "test" else "d"
         fileName = "Inputs/" ++ iType ++ (show pNr) ++ ".txt"
 
-    putStr $ "Day " ++ (show pNr)
-    putStr "\n"
-
     fileExists <- doesFileExist fileName
 
     if not fileExists then
-        putStr "Input does not exist"
+        putStrLn $ "Day " ++ (show pNr) ++ " not solved yet"
     else do
+        putStrLn $ "Day " ++ (show pNr)
+
         handle <- openFile fileName ReadMode
         input <- hGetContents handle
 
@@ -57,14 +56,12 @@ performCalculations isTest pNr = do
 
 
         start1 <- getCPUTime
-        putStr $ "Deel 1: " ++ solveP1 problem
+        putStrLn $ "Deel 1: " ++ solveP1 problem
         end1 <- getCPUTime
-        putStr "\n"
 
         start2 <- getCPUTime
-        putStr $ "Deel 2: " ++ solveP2 problem
+        putStrLn $ "Deel 2: " ++ solveP2 problem
         end2 <- getCPUTime
-        putStr "\n"
 
         let d1 = (fromIntegral (end1 - start1)) / (10^12)
             d2 = (fromIntegral (end2 - start2)) / (10^12)
@@ -80,7 +77,7 @@ main = do
 
     putStr "\n"
 
-    if pNr == "all" then
+    if pNr == "all" || pNr == "a" then
         mapM (performCalculations isTest) [1..25]
     else do
         performCalculations isTest $ read pNr

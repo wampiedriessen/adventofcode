@@ -42,4 +42,4 @@ removeUncompared ([],_) = []
 removeUncompared (x:xs,y:ys) = if x == y then x:(removeUncompared (xs,ys)) else removeUncompared (xs,ys)
 
 solveP2 :: [String] -> String
-solveP2 = show . removeUncompared . head . filter hasOneDiff . createAllPairs
+solveP2 = removeUncompared . head . filter hasOneDiff . createAllPairs
