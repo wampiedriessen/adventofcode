@@ -4,7 +4,6 @@ module Solutions.Day04
 
 import CommonHelpers
 import qualified Data.List as L
-import qualified Data.Set as S
 import Data.Function (on)
 
 solvers = [solveP1,solveP2]
