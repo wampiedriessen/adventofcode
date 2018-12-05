@@ -2,6 +2,7 @@ import qualified Solutions.Day1 as D1
 import qualified Solutions.Day2 as D2
 import qualified Solutions.Day3 as D3
 import qualified Solutions.Day4 as D4
+import qualified Solutions.Day5 as D5
 
 import System.CPUTime
 import System.Environment
@@ -10,7 +11,7 @@ import Text.Printf
 
 import CommonHelpers
 
-solutions = [D1.solvers, D2.solvers, D3.solvers, D4.solvers]
+solutions = [D1.solvers, D2.solvers, D3.solvers, D4.solvers, D5.solvers]
 
 main = do
 
