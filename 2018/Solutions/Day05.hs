@@ -9,7 +9,7 @@ import qualified Data.Char as C
 solvers = [solveP1,solveP2]
 
 comp :: Char -> Char -> Bool
-comp a b = (C.isLower a && C.toUpper a == b) || (C.isLower b && C.toUpper b == a)
+comp a b = a /= b && (C.toUpper a == C.toUpper b)
 
 reactUnits :: Char -> [Char] -> [Char]
 reactUnits x [] = [x]
