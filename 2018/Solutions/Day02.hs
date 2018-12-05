@@ -13,11 +13,16 @@ hasTwo = not . L.null . filter ((2 ==) . length) . L.group . L.sort
 hasThree :: String -> Bool
 hasThree = not . L.null . filter ((3 ==) . length) . L.group . L.sort
 
-solveP1 :: [String] -> String
-solveP1 x =
+recSolve1 [] = (0,0)
+recSolve1 (tag:tags) =
     let
-        counters = foldr (\tag (twos,threes) -> (twos + (if hasTwo tag then 1 else 0), threes + (if hasThree tag then 1 else 0))) (0,0) x
-    in show $ (fst counters) * (snd counters)
+        (twos,threes) = recSolve1 tags
+        plus2 = if hasTwo tag then 1 else 0
+        plus3 = if hasThree tag then 1 else 0
+    in (twos+plus2,threes+plus3)
+
+solveP1 :: [String] -> String
+solveP1 = show . uncurry (*) . recSolve1
 
 -- || Start Part 2
 

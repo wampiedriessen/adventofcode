@@ -56,8 +56,6 @@ performCalculations isTest pNr = do
             solveP2 = (solutions !! (pNr - 1)) !! 1;
             problem = lines input
 
-
-
         start1 <- getCPUTime
         putStrLn $ "Deel 1: " ++ solveP1 problem
         end1 <- getCPUTime
