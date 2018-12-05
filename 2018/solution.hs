@@ -34,10 +34,13 @@ import CommonHelpers
 
 solutions = [D01.solvers, D02.solvers, D03.solvers, D04.solvers, D05.solvers, D06.solvers, D07.solvers, D08.solvers, D09.solvers, D10.solvers, D11.solvers, D12.solvers, D13.solvers, D14.solvers, D15.solvers, D16.solvers, D17.solvers, D18.solvers, D19.solvers, D20.solvers, D21.solvers, D22.solvers, D23.solvers, D24.solvers, D25.solvers]
 
+padShow :: (Num a, Ord a, Show a) => a -> String
+padShow x = if x > 9 then show x else "0" ++ (show x)
+
 performCalculations :: Bool -> Int -> IO ()
 performCalculations isTest pNr = do
     let iType = if isTest then "test" else "d"
-        fileName = "Inputs/" ++ iType ++ (show pNr) ++ ".txt"
+        fileName = "Inputs/" ++ iType ++ (padShow pNr) ++ ".txt"
 
     fileExists <- doesFileExist fileName
 
