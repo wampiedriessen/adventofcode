@@ -41,7 +41,7 @@ calcOuterCoords coords =
         xRange = [(minimum $ map getX coords)..(maximum $ map getX coords)]
         yRange = [(minimum $ map getY coords)..(maximum $ map getY coords)]
         box = [map (fst . flip closestNode coords) [Coord x y | x <- xRange] | y <- yRange]
-    in (S.fromList $ concat [box !! 0, box !! ((length box) - 1), map head box, map last box], box)
+    in (S.fromList $ concat [box !! 0, box !! ((length box) - 1), map head box, map last box], box, xRange, yRange)
 
 unwrap :: Maybe Int -> Int
 unwrap x = case x of
@@ -52,12 +52,18 @@ solveP1 :: [String] -> String
 solveP1 x =
     let
         coords = map readC x
-        (outerNodes,grid) = calcOuterCoords coords
+        (outerNodes,grid,_,_) = calcOuterCoords coords
         innerCoords = filter (not . (flip S.member outerNodes)) coords
     in show $ countMostPrevalent $ filter (`elem` innerCoords) $ concat grid
-    -- in show innerCoords
 
 -- || Start Part 2
 
+sumDistances x = sum . map (mDistance x)
+
 solveP2 :: [String] -> String
-solveP2 x = "ToDo: part 2"
+solveP2 x =
+    let
+        coords = map readC x
+        (_,_,xRange,yRange) = calcOuterCoords coords
+        totDistances = map (flip sumDistances coords) [Coord x y | x <- xRange, y <- yRange]
+    in show $ length $ filter (<10000) $ totDistances
