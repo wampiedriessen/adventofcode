@@ -3,10 +3,12 @@ module CommonHelpers
 , getIntList
 , countOccurs
 , splitCommaSpaceDelimited
+, countMostPrevalent
 ) where
 
 import qualified Data.Char as C
 import qualified Data.List as L
+import qualified Data.Map as M
 
 -- Gets integer lists per line of input
 getIntList :: String -> [[Int]]
@@ -25,6 +27,11 @@ countOccurs = map (\x -> (head x, length x)) . L.group . L.sort
 -- like 'words', but including the comma that separates
 splitCommaSpaceDelimited :: String -> [String]
 splitCommaSpaceDelimited = map (takeWhile (/=',')) . words
+
+countMostPrevalent :: (Ord a) => [a] -> Int
+countMostPrevalent [] = 0
+countMostPrevalent (x:xs) = maximum $ M.elems $ foldr foldFun (M.fromList [(x,1)]) xs
+    where foldFun x acc = if M.member x acc then M.insertWith (+) x 1 acc else M.insert x 1 acc
 
 -- Default Binary Tree datastructure
 data Tree a = EmptyTree | Node a (Tree a) (Tree a) deriving (Show, Read, Eq)
