@@ -4,6 +4,7 @@ module CommonHelpers
 , countOccurs
 , splitCommaSpaceDelimited
 , countMostPrevalent
+, unwrapInt
 ) where
 
 import qualified Data.Char as C
@@ -32,6 +33,11 @@ countMostPrevalent :: (Ord a) => [a] -> Int
 countMostPrevalent [] = 0
 countMostPrevalent (x:xs) = maximum $ M.elems $ foldr foldFun (M.fromList [(x,1)]) xs
     where foldFun x acc = if M.member x acc then M.insertWith (+) x 1 acc else M.insert x 1 acc
+
+unwrapInt :: Maybe Int -> Int
+unwrapInt x = case x of
+        Just x -> x
+        Nothing -> -1
 
 -- Default Binary Tree datastructure
 data Tree a = EmptyTree | Node a (Tree a) (Tree a) deriving (Show, Read, Eq)

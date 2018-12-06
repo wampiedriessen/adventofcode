@@ -4,7 +4,6 @@ module Solutions.Day06
 
 import CommonHelpers
 import qualified Data.List as L
-import qualified Data.Map as M
 import qualified Data.Set as S
 
 solvers = [solveP1,solveP2]
@@ -41,12 +40,8 @@ calcOuterCoords coords =
         xRange = [(minimum $ map getX coords)..(maximum $ map getX coords)]
         yRange = [(minimum $ map getY coords)..(maximum $ map getY coords)]
         box = [map (fst . flip closestNode coords) [Coord x y | x <- xRange] | y <- yRange]
-    in (S.fromList $ concat [box !! 0, box !! ((length box) - 1), map head box, map last box], box, xRange, yRange)
-
-unwrap :: Maybe Int -> Int
-unwrap x = case x of
-        Just x -> x
-        Nothing -> -1
+        outerElements = S.fromList $ concat [box !! 0, box !! ((length box) - 1), map head box, map last box]
+    in (outerElements, box, xRange, yRange)
 
 solveP1 :: [String] -> String
 solveP1 x =
@@ -58,12 +53,15 @@ solveP1 x =
 
 -- || Start Part 2
 
-sumDistances x = sum . map (mDistance x)
-
 solveP2 :: [String] -> String
-solveP2 x =
+solveP2 x = concat ["test: ", solveP2' True x," real: ", solveP2' False x]
+
+solveP2' :: Bool -> [String] -> String
+solveP2' isTest x =
     let
+        limit = if isTest then 32 else 10000
         coords = map readC x
         (_,_,xRange,yRange) = calcOuterCoords coords
+        sumDistances x = sum . map (mDistance x)
         totDistances = map (flip sumDistances coords) [Coord x y | x <- xRange, y <- yRange]
-    in show $ length $ filter (<10000) $ totDistances
+    in show $ length $ filter (<limit) $ totDistances
