@@ -6,42 +6,20 @@ import CommonHelpers
 import qualified Data.List as L
 import qualified Data.Set as S
 import qualified Data.Map as M
+import Data.Function (on)
 
 solvers = [solveP1,solveP2]
 
 -- Step Z must be finished before step H can begin.
-parse :: String -> (String,S.Set String)
-parse x =
-    let split = words x
-    in (split !! 1, S.fromList [split !! 7])
-
 parseDep :: String -> (String,S.Set String)
 parseDep x =
     let split = words x
     in (split !! 7, S.fromList [split !! 1])
 
-firstInSet = head . S.toList
-lastInSet = last . S.toList
-
 findTargets :: String -> M.Map String (S.Set String) -> S.Set String
 findTargets key graph = case M.lookup key graph of
         Nothing -> S.empty
         Just x -> x
-
--- recurse1 :: S.Set String -> String -> M.Map String [String] -> String
--- recurse1 todo first graph =
---     let newTargets = S.union (S.delete first todo) $ S.fromList $ findTargets first graph
---     in if S.null newTargets then first
---         else first ++ (recurse1 (tail newStack) (head newStack) graph)
-
--- targetsToGo :: String -> M.Map String (S.Set String) -> S.Set String
--- targetsToGo from graph = S.insert from $ S.foldl (\acc x -> S.union acc $ targetsToGo x graph) S.empty $ findTargets from graph
-
--- firstEligibleInSet :: S.Set String -> M.Map String (S.Set String) -> String
--- firstEligibleInSet targets graph =
---     let
---         blocked = S.foldl S.union S.empty $ S.map (\x -> S.delete x $ targetsToGo x graph) targets
---     in last $ filter (not . flip S.member blocked) $ S.toList targets
 
 getFreeDeps :: S.Set String -> S.Set String -> M.Map String (S.Set String) -> S.Set String
 getFreeDeps todo done graph = S.filter (S.null . flip S.difference done . flip findTargets graph) todo
@@ -49,23 +27,53 @@ getFreeDeps todo done graph = S.filter (S.null . flip S.difference done . flip f
 recurse1 :: S.Set String -> S.Set String -> M.Map String (S.Set String) -> String
 recurse1 todo done graph = if S.null todo then ""
     else let
-        rootDeps = getFreeDeps todo done graph
-        this = firstInSet rootDeps
-        newDone = S.insert this done
-        newTodo = S.delete this todo
-    in this ++ recurse1 newTodo newDone graph
+        firstNew = head $ S.toList $ getFreeDeps todo done graph
+        newDone = S.insert firstNew done
+        newTodo = S.delete firstNew todo
+    in firstNew ++ recurse1 newTodo newDone graph
 
 solveP1 :: [String] -> String
 solveP1 x =
     let
         input = map parseDep x
         graph = M.fromListWith (\n1 n2 -> S.union n1 n2) $ input
-        targets = foldl (S.union) S.empty $ M.elems graph
-        start = head $ L.nub $ map fst $ filter (not . (flip S.member targets) . fst) input
-        all = S.insert start targets
+        values = foldl (S.union) S.empty $ M.elems graph
+        keys = S.fromList $ M.keys graph
+        all = S.union keys values
     in recurse1 all S.empty graph
 
 -- || Start Part 2
 
+recurse2 :: Int -> ([String] -> [(String,Int)]) -> S.Set String -> [(String,Int)] -> S.Set String -> M.Map String (S.Set String) -> Int
+recurse2 nrOfWorkers getDurations todo busy done graph = if S.null todo then 0
+    else let
+        freeSlots = nrOfWorkers - (length busy)
+        busyNodes = S.fromList $ map (fst) busy
+        newNodes = take freeSlots $ S.toList $ (getFreeDeps todo done graph) S.\\ busyNodes
+        ((node,time):tmpBusy) = L.sortBy (compare `on` snd) $ busy ++ getDurations newNodes
+
+        newBusy = map (\(n,x) -> (n,x-time)) tmpBusy
+
+        newDone = S.insert node done
+        newTodo = S.delete node todo
+    in time + recurse2 nrOfWorkers getDurations newTodo newBusy newDone graph
+
+tShortLookup = M.fromList $ zip (map (:"") ['A'..]) [1,2..]
+tLongLookup = M.fromList $ zip (map (:"") ['A'..]) [61,62..]
+
 solveP2 :: [String] -> String
-solveP2 x = "ToDo: part 2"
+solveP2 x =
+    let
+        getShortDurations = map (\x -> (x,unwrapInt $ M.lookup x tShortLookup))
+        getLongDurations = map (\x -> (x,unwrapInt $ M.lookup x tLongLookup))
+    in concat ["test: ", solveP2' 2 getShortDurations x," real: ", solveP2' 5 getLongDurations x]
+
+solveP2' :: Int -> ([String] -> [(String,Int)]) -> [String] -> String
+solveP2' nrOfWorkers durationFun x =
+    let
+        input = map parseDep x
+        graph = M.fromListWith (\n1 n2 -> S.union n1 n2) $ input
+        values = foldl (S.union) S.empty $ M.elems graph
+        keys = S.fromList $ M.keys graph
+        all = S.union keys values
+    in show $ recurse2 nrOfWorkers durationFun all [] S.empty graph
