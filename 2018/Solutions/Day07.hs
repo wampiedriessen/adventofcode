@@ -34,31 +34,36 @@ findTargets key graph = case M.lookup key graph of
 --     in if S.null newTargets then first
 --         else first ++ (recurse1 (tail newStack) (head newStack) graph)
 
-targetsToGo :: String -> M.Map String (S.Set String) -> S.Set String
-targetsToGo from graph = S.insert from $ S.foldl (\acc x -> S.union acc $ targetsToGo x graph) S.empty $ findTargets from graph
+-- targetsToGo :: String -> M.Map String (S.Set String) -> S.Set String
+-- targetsToGo from graph = S.insert from $ S.foldl (\acc x -> S.union acc $ targetsToGo x graph) S.empty $ findTargets from graph
 
-firstEligibleInSet :: S.Set String -> M.Map String (S.Set String) -> String
-firstEligibleInSet targets graph =
-    let
-        blocked = S.foldl S.union S.empty $ S.map (\x -> S.delete x $ targetsToGo x graph) targets
-    in head $ filter (not . flip S.member blocked) $ S.toList targets
+-- firstEligibleInSet :: S.Set String -> M.Map String (S.Set String) -> String
+-- firstEligibleInSet targets graph =
+--     let
+--         blocked = S.foldl S.union S.empty $ S.map (\x -> S.delete x $ targetsToGo x graph) targets
+--     in last $ filter (not . flip S.member blocked) $ S.toList targets
 
-recurse1 :: S.Set String -> M.Map String (S.Set String) -> String
-recurse1 targets graph =
-    let
-        top = firstEligibleInSet targets graph
-        newTargets = S.delete top $ S.union targets $ targetsToGo top graph
-    in if S.null newTargets then top
-        else top ++ (recurse1 newTargets graph)
+getFreeDeps :: S.Set String -> S.Set String -> M.Map String (S.Set String) -> S.Set String
+getFreeDeps todo done graph = S.filter (S.null . flip S.difference done . flip findTargets graph) todo
+
+recurse1 :: S.Set String -> S.Set String -> M.Map String (S.Set String) -> String
+recurse1 todo done graph = if S.null todo then ""
+    else let
+        rootDeps = getFreeDeps todo done graph
+        this = firstInSet rootDeps
+        newDone = S.insert this done
+        newTodo = S.delete this todo
+    in this ++ recurse1 newTodo newDone graph
 
 solveP1 :: [String] -> String
 solveP1 x =
     let
-        input = map parse x
+        input = map parseDep x
         graph = M.fromListWith (\n1 n2 -> S.union n1 n2) $ input
         targets = foldl (S.union) S.empty $ M.elems graph
-        first = S.fromList $ L.nub $ map fst $ filter (not . (flip S.member targets) . fst) input
-    in recurse1 first graph
+        start = head $ L.nub $ map fst $ filter (not . (flip S.member targets) . fst) input
+        all = S.insert start targets
+    in recurse1 all S.empty graph
 
 -- || Start Part 2
 
