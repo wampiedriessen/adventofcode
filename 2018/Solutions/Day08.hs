@@ -2,9 +2,6 @@ module Solutions.Day08
 ( solvers
 ) where
 
-import CommonHelpers
-import qualified Data.List as L
-
 solvers = [solveP1,solveP2]
 
 data Tree = Node [Int] [Tree] deriving (Show, Read, Eq)
