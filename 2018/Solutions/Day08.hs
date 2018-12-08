@@ -20,8 +20,11 @@ parseTree (num:x:rest) =
     let (children,restInput) = foldl accumulateChildren ([],rest) [1..num]
     in (Node (take x restInput) children, drop x restInput)
 
+getInputTree :: [String] -> Tree
+getInputTree = fst . parseTree . parse
+
 solveP1 :: [String] -> String
-solveP1 = show . recurse . fst . parseTree . parse
+solveP1 = show . recurse . getInputTree
     where recurse (Node mData children) = (sum mData) + (sum $ map recurse children)
 
 -- || Start Part 2
@@ -36,4 +39,4 @@ recursep2 (Node mData children) =
             else recursep2 $ children !! (index-1)
 
 solveP2 :: [String] -> String
-solveP2 = show . recursep2 . fst . parseTree . parse
+solveP2 = show . recursep2 . getInputTree
