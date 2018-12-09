@@ -3,7 +3,7 @@ module Solutions.Day09
 ) where
 
 import CommonHelpers
-import qualified Data.Map as M
+import qualified Data.Map.Strict as M
 import qualified Data.List as L
 import qualified Data.Sequence as S
 
