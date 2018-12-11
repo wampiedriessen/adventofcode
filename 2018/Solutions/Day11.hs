@@ -9,7 +9,7 @@ import Data.Function (on)
 
 solvers = [solveP1,solveP2]
 
-type CoordLevel = (Int,Int,Int)
+type Coordinate = (Int,Int)
 
 powerlevel :: Int -> Int -> Int -> Int
 powerlevel input x y =
@@ -18,50 +18,55 @@ powerlevel input x y =
         ans = (quot (subAns `mod` 1000) 100) - 5
     in ans
 
-getEdges size x y =
-    [(x+(size-1),y') | y' <- [y..(y+(size-1))]] ++ [(x',y+(size-1)) | x' <- [x..(x+(size-2))]]
+createSumGridMiddle input grid [] = grid
+createSumGridMiddle input grid ((x,y):rest) =
+    let gridL = unwrapInt . (flip M.lookup grid)
+        power = powerlevel input x y
+        powerSum = power + (gridL (x,y-1)) + (gridL (x-1,y)) - (gridL (x-1,y-1))
+        newGrid = M.insert (x,y) powerSum grid
+    in createSumGridMiddle input newGrid rest
 
-powerLevelDepth :: (M.Map CoordLevel Int) -> Int -> Int -> Int -> Int
-powerLevelDepth grid size x y =
-    if size == 1 then unwrapInt $ M.lookup (x,y,1) grid
-        else let
-            lowerGridSize = unwrapInt $ M.lookup (x,y,size-1) grid
-            edges = getEdges size x y
-            sumEdges = sum $! map (uncurry (powerLevelDepth grid 1)) edges
-        in sumEdges + lowerGridSize
+createSumGrid input width =
+    let powlev = uncurry (powerlevel input)
+        first = powlev (1,1)
+        topEdge = [(x,1) | x <- [2..width]]
+        leftEdge = [(1,y) | y <- [2..width]]
+        topVals = scanl (\acc x -> acc + (powlev x)) first topEdge
+        leftVals = scanl (\acc x -> acc + (powlev x)) first leftEdge
+        edgeCases = M.union (M.fromList $ zip ((1,1):topEdge) topVals) (M.fromList $ zip ((1,1):leftEdge) leftVals)
+        middles = [(x,y) | x <- [2..width], y <- [2..width]]
+    in createSumGridMiddle input edgeCases middles
 
-newPowerLevels :: (M.Map CoordLevel Int) -> Int -> [(Int,Int)] -> [(CoordLevel,Int)]
-newPowerLevels grid level = map (\(x,y) -> (((x,y,level) :: CoordLevel),powerLevelDepth grid level x y))
+getAreaPower grid size (x,y) =
+    let
+        z = size-1
+        xA = unwrapInt $ M.lookup (x-1,y-1) grid
+        xB = unwrapInt $ M.lookup (x+z,y-1) grid
+        xC = unwrapInt $ M.lookup (x-1,y+z) grid
+        xD = unwrapInt $ M.lookup (x+z,y+z) grid
+    in xD + xA - xB - xC
 
-createGrids :: (M.Map CoordLevel Int) -> Int -> ((M.Map CoordLevel Int),(CoordLevel,Int))
-createGrids grid level =
-    if level == 1 then (grid,((1,1,1),0))
-        else let
-            (lowerGrid,highest) = createGrids grid (level-1)
-            coordsForLevel = [(x,y) | x <- [1..(301-level)], y <- [1..(301-level)]]
-            newPowers = newPowerLevels lowerGrid level coordsForLevel
-            newHighest = L.maximumBy (compare `on` snd) (highest:newPowers)
-        in (M.union grid $ M.fromList newPowers, newHighest)
-
-showAns :: CoordLevel -> String
-showAns (x,y,z) = (show x) ++ "," ++ (show y) ++ "," ++ (show z)
+solveForSize grid size =
+    let coords = [(x,y) | x <- [1..(301-size)], y <- [1..(301-size)]]
+        totalPower = getAreaPower grid size
+        maxCoord = L.maximumBy (compare `on` totalPower) coords
+    in (maxCoord, totalPower maxCoord)
 
 solve1 x =
-    let powlev = uncurry (powerlevel x)
-        grid = M.fromList [((x,y,1),powlev (x,y)) | x <- [1..300], y <- [1..300]]
-        powergrid = createGrids grid 3
-    in showAns $ fst $ snd $ powergrid
+    let sumgrid = createSumGrid x 300
+    in show $ fst $ solveForSize sumgrid 3
 
 solveP1 :: [String] -> String
 solveP1 = ('\n':) . unlines . map (solve1 . read)
 
 -- || Start Part 2
 
+showAns (((x,y),_),z) = (show x) ++ "," ++ (show y) ++ "," ++ (show z)
+
 solve2 x =
-    let powlev = uncurry (powerlevel x)
-        grid = M.fromList [((x,y,1),powlev (x,y)) | x <- [1..300], y <- [1..300]]
-        powergrid = createGrids grid 300
-    in showAns $ fst $ snd $ powergrid
+    let sumgrid = createSumGrid x 300
+        levelsBests = zip (map (solveForSize sumgrid) [3..300]) [3..300]
+    in showAns $ L.maximumBy (compare `on` (snd . fst)) levelsBests
 
 solveP2 :: [String] -> String
 solveP2 = ('\n':) . unlines . map (solve2 . read)

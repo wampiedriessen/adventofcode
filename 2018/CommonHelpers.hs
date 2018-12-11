@@ -37,7 +37,7 @@ countMostPrevalent (x:xs) = maximum $ M.elems $ foldr foldFun (M.fromList [(x,1)
 unwrapInt :: Maybe Int -> Int
 unwrapInt x = case x of
         Just x -> x
-        Nothing -> -1
+        Nothing -> 0
 
 -- Default Binary Tree datastructure
 data Tree a = EmptyTree | Node a (Tree a) (Tree a) deriving (Show, Read, Eq)
