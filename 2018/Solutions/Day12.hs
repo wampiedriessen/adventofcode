@@ -94,16 +94,29 @@ plantScore = sum . map (\(n,p) -> if p == True then n else 0)
 printPlants :: [Pot] -> String
 printPlants = map (\(_,x) -> if x == True then '#' else '.')
 
-solve :: Int -> [String] -> String
-solve gens x =
+solveP1 :: [String] -> String
+solveP1 x =
     let init = readStartConfig $ head x
         rules = M.unions $ map readRule $ drop 2 x
-    in show $ plantScore $ iterations rules init gens
-
-solveP1 :: [String] -> String
-solveP1 = solve 20
+    in show $ plantScore $ iterations rules init 20
 
 -- || Start Part 2
 
+findInterval rules delta score pots toGo confirmations =
+    if confirmations == 0 then (pots,delta,toGo)
+        else let
+        newPots = iterations rules pots 1
+        newScore = plantScore newPots
+        newDelta = newScore - score
+        in if newDelta == delta then
+            findInterval rules newDelta newScore newPots (toGo-1) (confirmations-1)
+        else findInterval rules newDelta newScore newPots (toGo-1) 3
+
 solveP2 :: [String] -> String
-solveP2 = solve 5000000000
+solveP2 x =
+    let init = readStartConfig $ head x
+        rules = M.unions $ map readRule $ drop 2 x
+        first = iterations rules init 20
+        firstScore = plantScore first
+        (stablePots, delta, left) = findInterval rules 0 firstScore first (50000000000-20) 3
+    in show $ delta * left + (plantScore stablePots)
