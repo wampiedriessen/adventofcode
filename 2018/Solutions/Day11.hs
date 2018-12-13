@@ -57,7 +57,7 @@ solve1 x =
     in show $ fst $ solveForSize sumgrid 3
 
 solveP1 :: [String] -> String
-solveP1 = ('\n':) . unlines . map (solve1 . read)
+solveP1 = head . map (solve1 . read)
 
 -- || Start Part 2
 
@@ -69,4 +69,4 @@ solve2 x =
     in showAns $ L.maximumBy (compare `on` (snd . fst)) levelsBests
 
 solveP2 :: [String] -> String
-solveP2 = ('\n':) . unlines . map (solve2 . read)
+solveP2 = head . map (solve2 . read)

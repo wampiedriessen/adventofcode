@@ -37,6 +37,20 @@ solutions = [D01.solvers, D02.solvers, D03.solvers, D04.solvers, D05.solvers, D0
 padShow :: (Num a, Ord a, Show a) => a -> String
 padShow x = if x > 9 then show x else "0" ++ (show x)
 
+doFunc :: ([String] -> String) -> [String] -> IO Double
+doFunc solve problem = do
+    start <- getTime Monotonic
+    putStrLn $ solve problem
+    end <- getTime Monotonic
+    return ((fromIntegral $ toNanoSecs $ diffTimeSpec start end) / (10^9))
+
+doRestFuncs :: Int -> [([String] -> String)] -> [String] -> IO ()
+doRestFuncs _ [] _ = return ()
+doRestFuncs i (x:xs) problem = do
+    putStr $ "Bonus func " ++ (show i) ++ ": "
+    doFunc x problem
+    doRestFuncs (i+1) xs problem
+
 performCalculations :: Bool -> Int -> IO ()
 performCalculations isTest pNr = do
     let iType = if isTest then "test" else "d"
@@ -52,22 +66,19 @@ performCalculations isTest pNr = do
         handle <- openFile fileName ReadMode
         input <- hGetContents handle
 
-        let solveP1 = (solutions !! (pNr - 1)) !! 0;
-            solveP2 = (solutions !! (pNr - 1)) !! 1;
+        let (solveP1:solveP2:rest) = (solutions !! (pNr - 1))
             problem = lines input
 
-        start1 <- getTime Monotonic
-        putStrLn $ "Deel 1: " ++ solveP1 problem
-        end1 <- getTime Monotonic
+        putStr "Deel 1: "
+        time1 <- doFunc solveP1 problem
+        putStr "Deel 2: "
+        time2 <- doFunc solveP2 problem
 
-        start2 <- getTime Monotonic
-        putStrLn $ "Deel 2: " ++ solveP2 problem
-        end2 <- getTime Monotonic
+        printf "Timings - 1: %0.6f sec, 2: %1.6f sec\n" (time1 :: Double) (time2 :: Double)
 
-        let d1 = (fromIntegral $ toNanoSecs $ diffTimeSpec start1 end1) / (10^9)
-            d2 = (fromIntegral $ toNanoSecs $ diffTimeSpec start2 end2) / (10^9)
-
-        printf "Timings - 1: %0.6f sec, 2: %1.6f sec\n" (d1 :: Double) (d2 :: Double)
+        do case rest of
+            [] -> return ()
+            otherwise -> doRestFuncs 1 rest problem
         putStr "\n"
 
 main = do

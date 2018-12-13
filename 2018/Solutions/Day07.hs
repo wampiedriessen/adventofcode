@@ -8,7 +8,7 @@ import qualified Data.Set as S
 import qualified Data.Map as M
 import Data.Function (on)
 
-solvers = [solveP1,solveP2]
+solvers = [solveP1,solveP2,solveP2Test]
 
 -- Step Z must be finished before step H can begin.
 parseDep :: String -> (String,S.Set String)
@@ -58,16 +58,6 @@ recurse2 nrOfWorkers getDurations todo busy done graph = if S.null todo then 0
         newTodo = S.delete node todo
     in time + recurse2 nrOfWorkers getDurations newTodo newBusy newDone graph
 
-tShortLookup = M.fromList $ zip (map (:"") ['A'..]) [1,2..]
-tLongLookup = M.fromList $ zip (map (:"") ['A'..]) [61,62..]
-
-solveP2 :: [String] -> String
-solveP2 x =
-    let
-        getShortDurations = map (\x -> (x,unwrapInt $ M.lookup x tShortLookup))
-        getLongDurations = map (\x -> (x,unwrapInt $ M.lookup x tLongLookup))
-    in concat ["test: ", solveP2' 2 getShortDurations x," real: ", solveP2' 5 getLongDurations x]
-
 solveP2' :: Int -> ([String] -> [(String,Int)]) -> [String] -> String
 solveP2' nrOfWorkers durationFun x =
     let
@@ -77,3 +67,16 @@ solveP2' nrOfWorkers durationFun x =
         keys = S.fromList $ M.keys graph
         all = S.union keys values
     in show $ recurse2 nrOfWorkers durationFun all [] S.empty graph
+
+tTestLookup = M.fromList $ zip (map (:"") ['A'..]) [1,2..]
+tRealLookup = M.fromList $ zip (map (:"") ['A'..]) [61,62..]
+
+solveP2 :: [String] -> String
+solveP2 x = let
+        getLongDurations = map (\x -> (x,unwrapInt $ M.lookup x tRealLookup))
+    in solveP2' 5 getLongDurations x
+
+solveP2Test :: [String] -> String
+solveP2Test x = let
+        getShortDurations = map (\x -> (x,unwrapInt $ M.lookup x tTestLookup))
+    in solveP2' 2 getShortDurations x
