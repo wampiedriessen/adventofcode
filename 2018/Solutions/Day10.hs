@@ -7,26 +7,26 @@ import Data.List
 
 solvers = [solveP1,solveP2]
 
-type Message = [Point]
-data Point = Point {x :: Int, y :: Int, vx :: Int, vy :: Int}
+type Message = [Light]
+data Light = Light {x :: Int, y :: Int, vx :: Int, vy :: Int}
 
 -- position=< 6, 10> velocity=<-2, -1>
-parsePoints :: [String] -> Message
-parsePoints = map (\x -> Point {x = readX x, y = readY x, vx = readVx x, vy = readVy x})
+parseLights :: [String] -> Message
+parseLights = map (\x -> Light {x = readX x, y = readY x, vx = readVx x, vy = readVy x})
     where
         readX = read . takeWhile (/=',') . tail . dropWhile (/='<')
         readY = read . takeWhile (/='>') . tail . dropWhile (/=',')
         readVx = read . takeWhile (/=',') . tail . dropWhile (/='<') . dropWhile (/='v')
         readVy = read . takeWhile (/='>') . tail . dropWhile (/=',') . dropWhile (/='v')
 
-step :: Int -> Point -> Point
-step stepsize (Point x y vx vy) =
+step :: Int -> Light -> Light
+step stepsize (Light x y vx vy) =
     let newX = x+(stepsize * vx)
         newY = y+(stepsize * vy)
-    in Point {x = newX, y = newY, vx = vx, vy = vy}
+    in Light {x = newX, y = newY, vx = vx, vy = vy}
 
-toTuple :: Point -> (Int,Int)
-toTuple (Point x y _ _) = (x,y)
+toTuple :: Light -> (Int,Int)
+toTuple (Light x y _ _) = (x,y)
 
 stepM :: Int -> Message -> Message
 stepM stepsize = map (step stepsize)
@@ -67,7 +67,7 @@ printMessage = ('\n':) . unlines . printableMessage
 solveP1 :: [String] -> String
 solveP1 x =
     let
-        basePoints = stepM 1 $ parsePoints x
+        basePoints = stepM 1 $ parseLights x
         tightest = findTightest (messageSize basePoints) basePoints
     in printMessage $ snd tightest
 
@@ -76,6 +76,6 @@ solveP1 x =
 solveP2 :: [String] -> String
 solveP2 x =
     let
-        basePoints = stepM 1 $ parsePoints x
+        basePoints = stepM 1 $ parseLights x
         tightest = findTightest (messageSize basePoints) basePoints
     in show $ 1 + (fst tightest)

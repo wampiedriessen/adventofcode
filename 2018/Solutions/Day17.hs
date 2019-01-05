@@ -10,15 +10,7 @@ import qualified Data.Map as M
 solvers = [solveP1,solveP2]
 
 data GroundState = Clay | StillWater | FallingWater deriving Eq
-data Coord = Point Int Int deriving (Eq,Ord,Show)
 type State = M.Map Coord GroundState
-
-getY (Point y x) = y
-getX (Point y x) = x
-above (Point y x) = Point (y-1) x
-below (Point y x) = Point (y+1) x
-leftOf (Point y x) = Point y (x-1)
-rightOf (Point y x) = Point y (x+1)
 
 splitDots :: String -> [String]
 splitDots [] = []

@@ -5,6 +5,13 @@ module CommonHelpers
 , splitCommaSpaceDelimited
 , countMostPrevalent
 , unwrapInt
+, Coord (Point)
+, getY
+, getX
+, above
+, below
+, leftOf
+, rightOf
 ) where
 
 import qualified Data.Char as C
@@ -39,18 +46,27 @@ unwrapInt x = case x of
         Just x -> x
         Nothing -> 0
 
+data Coord = Point Int Int deriving (Eq,Ord,Show)
+
+getY (Point y x) = y
+getX (Point y x) = x
+above (Point y x) = Point (y-1) x
+below (Point y x) = Point (y+1) x
+leftOf (Point y x) = Point y (x-1)
+rightOf (Point y x) = Point y (x+1)
+
 -- Default Binary Tree datastructure
-data Tree a = EmptyTree | Node a (Tree a) (Tree a) deriving (Show, Read, Eq)
+-- data Tree a = EmptyTree | Node a (Tree a) (Tree a) deriving (Show, Read, Eq)
 
-treeSingleton :: a -> Tree a
-treeSingleton x = Node x EmptyTree EmptyTree
+-- treeSingleton :: a -> Tree a
+-- treeSingleton x = Node x EmptyTree EmptyTree
 
-treeInsert :: (Ord a) => a -> Tree a -> Tree a
-treeInsert x EmptyTree = treeSingleton x
-treeInsert x (Node a left right)
-    | x == a = Node x left right
-    | x < a  = Node a (treeInsert x left) right
-    | x > a  = Node a left (treeInsert x right)
+-- treeInsert :: (Ord a) => a -> Tree a -> Tree a
+-- treeInsert x EmptyTree = treeSingleton x
+-- treeInsert x (Node a left right)
+--     | x == a = Node x left right
+--     | x < a  = Node a (treeInsert x left) right
+--     | x > a  = Node a left (treeInsert x right)
 
 -- Default Heap datastructure UNFINISHED - Copy from Tree
 -- data Heap a = EmptyHeap | Node a [Heap] deriving (Show, Read, Eq)

@@ -8,17 +8,17 @@ import qualified Data.Set as S
 
 solvers = [solveP1,solveP2]
 
-data Claim = Coord { x :: Int, y :: Int } | Nada | Tie deriving (Eq, Ord, Show)
+data Claim = Patch { x :: Int, y :: Int } | Nada | Tie deriving (Eq, Ord, Show)
 
-getX (Coord x _) = x
-getY (Coord _ y) = y
+getPX (Patch x _) = x
+getPY (Patch _ y) = y
 
 readC :: String -> Claim
 readC = tup . map read . words . L.delete ','
-    where tup (x:y:_) = Coord x y
+    where tup (x:y:_) = Patch x y
 
 mDistance :: Claim -> Claim -> Int
-mDistance (Coord x1 y1) (Coord x2 y2) = (abs $ x1 - x2) + (abs $ y1 - y2)
+mDistance (Patch x1 y1) (Patch x2 y2) = (abs $ x1 - x2) + (abs $ y1 - y2)
 
 closestNode :: Claim -> [Claim] -> (Claim,Int)
 closestNode _ [] = (Nada,0)
@@ -29,7 +29,7 @@ closestNode x (f:coords) =
     in case fst best of
         Nada -> (f, cur)
         Tie -> if cur < (snd best) then (f, cur) else best
-        Coord _ _ -> if cur > (snd best)
+        Patch _ _ -> if cur > (snd best)
             then best
             else if cur == (snd best)
                 then (Tie,cur)
@@ -37,9 +37,9 @@ closestNode x (f:coords) =
 
 calcOuterCoords coords =
     let
-        xRange = [(minimum $ map getX coords)..(maximum $ map getX coords)]
-        yRange = [(minimum $ map getY coords)..(maximum $ map getY coords)]
-        box = [map (fst . flip closestNode coords) [Coord x y | x <- xRange] | y <- yRange]
+        xRange = [(minimum $ map getPX coords)..(maximum $ map getPX coords)]
+        yRange = [(minimum $ map getPY coords)..(maximum $ map getPY coords)]
+        box = [map (fst . flip closestNode coords) [Patch x y | x <- xRange] | y <- yRange]
         outerElements = S.fromList $ concat [box !! 0, box !! ((length box) - 1), map head box, map last box]
     in (outerElements, box, xRange, yRange)
 
@@ -63,5 +63,5 @@ solveP2' isTest x =
         coords = map readC x
         (_,_,xRange,yRange) = calcOuterCoords coords
         sumDistances x = sum . map (mDistance x)
-        totDistances = map (flip sumDistances coords) [Coord x y | x <- xRange, y <- yRange]
+        totDistances = map (flip sumDistances coords) [Patch x y | x <- xRange, y <- yRange]
     in show $ length $ filter (<limit) $ totDistances
