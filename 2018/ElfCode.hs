@@ -1,6 +1,8 @@
 module ElfCode
 ( Registers
+, emptyRegs
 , Instruction (Op)
+, InstructionList
 , addr_instruction
 , addi_instruction
 , mulr_instruction
@@ -18,14 +20,22 @@ module ElfCode
 , eqri_instruction
 , eqrr_instruction
 , getRegVal
+, setRegVal
+, incrementReg
+, opStringToCode
+, parseInstruction
+, parseInstructions
 , eval
 ) where
 
+import qualified Data.Vector as V
 import Data.Bits
 import qualified Data.IntMap.Strict as IM
 
 type Registers = IM.IntMap Int
+emptyRegs = (IM.empty :: Registers)
 data Instruction = Op Int Int Int Int
+type InstructionList = V.Vector Instruction
 
 addr_instruction = 3  -- (add register) stores into register C the result of adding register A and register B.
 addi_instruction = 5  -- (add immediate) stores into register C the result of adding register A and value B.
@@ -44,10 +54,44 @@ eqir_instruction = 12 -- (equal immediate/register) sets register C to 1 if valu
 eqri_instruction = 2 -- (equal register/immediate) sets register C to 1 if register A is equal to value B. Otherwise, register C is set to 0.
 eqrr_instruction = 4 -- (equal register/register) sets register C to 1 if register A is equal to register B. Otherwise, register C is set to 0.
 
+opStringToCode :: String -> Int
+opStringToCode x = case x of
+    "addr" -> addr_instruction
+    "addi" -> addi_instruction
+    "mulr" -> mulr_instruction
+    "muli" -> muli_instruction
+    "banr" -> banr_instruction
+    "bani" -> bani_instruction
+    "borr" -> borr_instruction
+    "bori" -> bori_instruction
+    "setr" -> setr_instruction
+    "seti" -> seti_instruction
+    "gtir" -> gtir_instruction
+    "gtri" -> gtri_instruction
+    "gtrr" -> gtrr_instruction
+    "eqir" -> eqir_instruction
+    "eqri" -> eqri_instruction
+    "eqrr" -> eqrr_instruction
+    otherwise -> error "unknown opString"
+
+parseInstruction :: String -> Instruction
+parseInstruction x = let
+    parts = words x
+    in Op (opStringToCode $ parts !! 0) (read $ parts !! 1) (read $ parts !! 2) (read $ parts !! 3)
+
+parseInstructions :: [String] -> InstructionList
+parseInstructions x = V.fromList $ map parseInstruction x
+
 getRegVal :: Registers -> Int -> Int
 getRegVal regs a = case IM.lookup a regs of
     Nothing -> 0
     Just x -> x
+
+setRegVal :: Registers -> Int -> Int -> Registers
+setRegVal regs a x = IM.insert a x regs
+
+incrementReg :: Registers -> Int -> Registers
+incrementReg regs a = setRegVal regs a $ (+1) $ getRegVal regs a
 
 eval :: Instruction -> Registers -> Registers
 eval (Op x a b c) regs = let

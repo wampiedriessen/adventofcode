@@ -81,6 +81,10 @@ performCalculations isTest pNr = do
             otherwise -> doRestFuncs 1 rest problem
         putStr "\n"
 
+interactWithSolution pNr = do
+    let (solveP1:solveP2:rest) = (solutions !! (pNr - 1))
+    interact (\x -> "P1: " ++ (solveP1 $ lines x) ++ "\n\nP2: " ++ (solveP2 $ lines x))
+
 main = do
     args <- getArgs
     let argv = length args
@@ -90,11 +94,14 @@ main = do
     else do
         let pNr = head args
             isTest = argv == 2
+            isInteract = argv == 3
 
         putStr "\n"
 
         if pNr == "all" || pNr == "a" then do
             mapM (performCalculations isTest) [1..25]
             return ()
+        else if isInteract then do
+            interactWithSolution $ read pNr
         else do
             performCalculations isTest $ read pNr
