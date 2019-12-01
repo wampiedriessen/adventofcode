@@ -21,10 +21,12 @@ jobs:
         with:
           toolchain: nightly
           override: true
+          working-directory: ./2019
       - uses: actions-rs/cargo@v1
         with:
           command: test
           args: --all-features --no-fail-fast
+          working-directory: ./2019
         env:
           CARGO_INCREMENTAL: '0'
           RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Zno-landing-pads'
