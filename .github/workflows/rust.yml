@@ -15,3 +15,5 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
       working-directory: ./2019
+    - name: Get Code Coverage
+      uses: actions-rs/grcov@v0.1.4
