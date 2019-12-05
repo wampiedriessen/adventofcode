@@ -10,10 +10,10 @@ pub struct Intcode {
 }
 
 impl Intcode {
-    pub fn new(program: IntcodeProg) -> Intcode {
+    pub fn new(program: &IntcodeProg) -> Intcode {
         Intcode {
             pc: 0,
-            ops: program,
+            ops: program.clone(),
             read_queue: VecDeque::new(),
             write_queue: VecDeque::new(),
         }
@@ -165,7 +165,7 @@ mod tests {
   use super::*;
 
   fn compute(program: IntcodeProg) -> IntcodeProg {
-    let mut t = Intcode::new(program);
+    let mut t = Intcode::new(&program);
 
     t.compute();
 
@@ -179,5 +179,56 @@ mod tests {
     assert_eq!(vec![2,3,0,6,99], compute(vec![2,3,0,3,99]));
     assert_eq!(vec![2,4,4,5,99,9801], compute(vec![2,4,4,5,99,0]));
     assert_eq!(vec![30,1,1,4,2,5,6,0,99], compute(vec![1,1,1,4,99,5,6,0,99]));
+  }
+
+  #[test]
+  fn jump_tests() {
+    // Position mode jump
+    let prog_jump_pos = vec![3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9];
+
+    let mut t = Intcode::new(&prog_jump_pos);
+    t.stdin(0);
+    t.compute();
+    assert_eq!(0, t.stdout().unwrap());
+
+    let mut t = Intcode::new(&prog_jump_pos);
+    t.stdin(-17);
+    t.compute();
+    assert_eq!(1, t.stdout().unwrap());
+
+
+    // Immediate mode jump
+    let prog_jump_imm = vec![3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9];
+    
+    t = Intcode::new(&prog_jump_imm);
+    t.stdin(0);
+    t.compute();
+    assert_eq!(0, t.stdout().unwrap());
+
+    let mut t = Intcode::new(&prog_jump_imm);
+    t.stdin(-17);
+    t.compute();
+    assert_eq!(1, t.stdout().unwrap());
+
+
+    // More complicated Jump example
+    let prog_jump = vec![3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
+    1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
+    999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99];
+
+    t = Intcode::new(&prog_jump);
+    t.stdin(1);
+    t.compute();
+    assert_eq!(999, t.stdout().unwrap());
+
+    t = Intcode::new(&prog_jump);
+    t.stdin(8);
+    t.compute();
+    assert_eq!(1000, t.stdout().unwrap());
+
+    t = Intcode::new(&prog_jump);
+    t.stdin(11);
+    t.compute();
+    assert_eq!(1001, t.stdout().unwrap());
   }
 }

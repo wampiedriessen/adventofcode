@@ -25,7 +25,7 @@ impl Day for Day02 {
 impl Day02 {
   
   fn compute(&self, program: IntcodeProg) -> i32 {
-    let mut t = Intcode::new(program);
+    let mut t = Intcode::new(&program);
 
     t.compute();
 

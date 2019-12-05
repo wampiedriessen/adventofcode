@@ -32,7 +32,7 @@ impl Day05 {
     }
 
     fn boot_system_id(&self, system_id: i32) -> i32 {
-        let mut t = Intcode::new(self.input.clone());
+        let mut t = Intcode::new(&self.input);
 
         t.stdin(system_id);
         t.compute();
