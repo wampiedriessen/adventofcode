@@ -1,14 +1,16 @@
 use std::collections::VecDeque;
 
+pub type IntcodeProg = Vec<i32>;
+
 pub struct Intcode {
     pc: usize,
-    ops: Vec<i32>,
+    ops: IntcodeProg,
     read_queue: VecDeque<i32>,
     write_queue: VecDeque<i32>,
 }
 
 impl Intcode {
-    pub fn new(program: Vec<i32>) -> Intcode {
+    pub fn new(program: IntcodeProg) -> Intcode {
         Intcode {
             pc: 0,
             ops: program,
@@ -16,9 +18,9 @@ impl Intcode {
             write_queue: VecDeque::new(),
         }
     }
-    
-    pub fn read_input(input:&str) -> Vec<i32> {
-        let mut vec: Vec<i32> = Vec::new();
+
+    pub fn read_input(input:&str) -> IntcodeProg {
+        let mut vec: IntcodeProg = Vec::new();
         for op in input.split(",") {
             vec.push(op.parse().unwrap())
         }
@@ -150,6 +152,7 @@ impl Intcode {
         return self.write_queue.pop_front();
     }
 
+    #[allow(dead_code)]
     pub fn debug(&self) -> () {
         println!("p: {:?}", self.ops);
         println!("r: {:?}", self.read_queue);
@@ -161,7 +164,7 @@ impl Intcode {
 mod tests {
   use super::*;
 
-  fn compute(program: Vec<i32>) -> Vec<i32> {
+  fn compute(program: IntcodeProg) -> IntcodeProg {
     let mut t = Intcode::new(program);
 
     t.compute();

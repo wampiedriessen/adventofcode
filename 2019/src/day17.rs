@@ -1,19 +1,32 @@
-pub fn part1() -> u32 {
-    let input = include_str!("../inputs/day17.txt").trim();
+use super::Day;
 
-    return run1(input);
+pub struct Day17 {
+  _input: u32
 }
 
-pub fn part2() -> u32 {
-    let input = include_str!("../inputs/day17.txt").trim();
+impl Day for Day17 {
+  fn new(_input: &str) -> Day17 {
+    Day17 {
+      _input: 0,
+    }
+  }
 
-    return run2(input);
+  fn part1(&self) -> Box<dyn std::fmt::Display> {
+    return Box::new(self.run1());
+  }
+
+  fn part2(&self) -> Box<dyn std::fmt::Display> {
+    return Box::new(self.run2());
+  }
 }
 
-fn run1(_input:&str) -> u32 {
-    return 0;
-}
+// -- Privates
+impl Day17 {
+    fn run1(&self) -> i32 {
+        return 0;
+    }
 
-fn run2(_input:&str) -> u32 {
-    return 0;
+    fn run2(&self) -> i32 {
+        return 0;
+    }
 }

@@ -1,36 +1,48 @@
-use super::intcode::Intcode;
+use super::Day;
+use super::intcode::{Intcode,IntcodeProg};
 
-pub fn part1() -> i32 {
-    let input = include_str!("../inputs/day02.txt").trim();
-
-    return run1(input);
+pub struct Day02 {
+  input: IntcodeProg
 }
 
-pub fn part2() -> i32 {
-    let input = include_str!("../inputs/day02.txt").trim();
+impl Day for Day02 {
+  fn new(input: &str) -> Day02 {
+    Day02 {
+      input: Intcode::read_input(input),
+    }
+  }
 
-    return run2(input, 19690720);
+  fn part1(&self) -> Box<dyn std::fmt::Display> {
+    return Box::new(self.run1());
+  }
+
+  fn part2(&self) -> Box<dyn std::fmt::Display> {
+    return Box::new(self.run2(19690720));
+  }
 }
 
-fn compute(program: Vec<i32>) -> i32 {
+// -- Privates
+impl Day02 {
+  
+  fn compute(&self, program: IntcodeProg) -> i32 {
     let mut t = Intcode::new(program);
 
     t.compute();
 
     return t.result();
-}
+  }
 
-fn run1(input:&str) -> i32 {
-    let mut program = Intcode::read_input(input);
+  fn run1(&self) -> i32 {
+    let mut program = self.input.clone();
 
     program[1] = 12;
     program[2] = 2;
 
-    return compute(program);
-}
+    return self.compute(program);
+  }
 
-fn run2(input:&str, goal: i32) -> i32 {
-    let orig_program = Intcode::read_input(input);
+  fn run2(&self, goal: i32) -> i32 {
+    let orig_program = self.input.clone();
 
     for noun in 0..100 {
         for verb in 0..100 {
@@ -38,13 +50,14 @@ fn run2(input:&str, goal: i32) -> i32 {
             program[1] = noun;
             program[2] = verb;
 
-            if compute(program) == goal {
+            if self.compute(program) == goal {
                 return 100 * noun + verb;
             }
         }
     }
 
     panic!("Goal not found");
+  }
 }
 
 #[cfg(test)]
@@ -53,26 +66,32 @@ mod tests {
 
   #[test]
   fn part1_sample_test() {
+    let day = Day02::new("99");
     
-    assert_eq!(2, compute(vec![1,0,0,0,99]));
-    assert_eq!(2, compute(vec![2,3,0,3,99]));
-    assert_eq!(2, compute(vec![2,4,4,5,99,0]));
-    assert_eq!(30, compute(vec![1,1,1,4,99,5,6,0,99]));
+    assert_eq!(2, day.compute(vec![1,0,0,0,99]));
+    assert_eq!(2, day.compute(vec![2,3,0,3,99]));
+    assert_eq!(2, day.compute(vec![2,4,4,5,99,0]));
+    assert_eq!(30, day.compute(vec![1,1,1,4,99,5,6,0,99]));
   }
 
   #[test]
   fn part2_sample_test() {
     let input = include_str!("../inputs/day02.txt").trim();
-    assert_eq!(1202, run2(input, 4714701));
+    let day = Day02::new(input);
+    assert_eq!(1202, day.run2(4714701));
   }
 
   #[test]
   fn part1_test() {
-    assert_eq!(4714701, part1());
+    let input = include_str!("../inputs/day02.txt").trim();
+    let day = Day02::new(input);
+    assert_eq!("4714701", format!("{}", day.part1()));
   }
 
   #[test]
   fn part2_test() {
-    assert_eq!(5121, part2());
+    let input = include_str!("../inputs/day02.txt").trim();
+    let day = Day02::new(input);
+    assert_eq!("5121", format!("{}", day.part2()));
   }
 }
