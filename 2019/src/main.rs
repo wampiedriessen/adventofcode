@@ -28,6 +28,8 @@ mod day23;
 mod day24;
 mod day25;
 
+mod intcode;
+
 use std::time::Instant;
 use std::env;
 
