@@ -4,4 +4,3 @@ version = "0.1.0"
 authors = ["Wampie Driessen <wampiedriessen@gmail.com>"]
 
 [dependencies]
-load_file = "1.0.0"

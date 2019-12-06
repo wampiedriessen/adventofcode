@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate load_file;
-
 mod day01;
 mod day02;
 mod day03;
@@ -54,6 +51,10 @@ fn main() {
 			}
 			return;
 		}
+		else if args[1] == "perfall" {
+			perf_all_full();
+			return;
+		}
 		let day = args[1].parse().unwrap();
 		run(day, 0, false, false);
 		return;
@@ -87,8 +88,10 @@ fn main() {
 }
 
 fn get_day(day:u32) -> Box<dyn Day> {
-	let inputfile = format!("../inputs/day{:02}.txt", day);
-	let input = load_str!(inputfile.as_str()).trim();
+	// relative to working directory, NOT executable
+	let inputfile = format!("inputs/day{:02}.txt", day);
+	let content = std::fs::read_to_string(inputfile).unwrap();
+	let input = content.as_str().trim();
 
 	match day {
 		01 => return Box::new(day01::Day01::new(input)),
@@ -143,7 +146,7 @@ fn run_internal(solution: Box<dyn Day>, part: u32) {
 }
 
 fn perf_internal(solution: Box<dyn Day>, day: u32, part: u32, in_loop_of_multiple: bool) {
-	let n = 20;
+	let n = 100;
 
 	if !in_loop_of_multiple || day == 1 || day == 13 {
 		println!("|--------|------------|-----------|-----------|");
@@ -162,7 +165,7 @@ fn perf_internal(solution: Box<dyn Day>, day: u32, part: u32, in_loop_of_multipl
 			print_perf(day, "f1", rounds_full1, n);
 
 			let rounds_full2 = (0..n).map(|_| perf_one_full(day, 2)).collect();
-			print_perf(day, "f1", rounds_full2, n);
+			print_perf(day, "f2", rounds_full2, n);
 		}
 		x => {
 			let rounds = (0..n).map(|_| perf_one(&solution, x)).collect();
@@ -192,12 +195,36 @@ fn perf_one_full(day: u32, part:u32) -> std::time::Duration {
 	return start.elapsed();
 }
 
+fn perf_all_full() {
+	let n = 100;
+
+	println!("|--------|------------|-----------|-----------|");
+	println!("| Puzzle |       Mean |     Error |    StdDev |");
+	println!("|--------|------------|-----------|-----------|");
+
+	let rounds = (0..n).map(|_| {
+		let start = Instant::now();
+		for d in 1..26 {
+			let day = get_day(d);
+			day.part1();
+			day.part2();
+		}
+		return start.elapsed();
+	}).collect();
+
+	let mean = mean(&rounds);
+	let stddev = stddeviation(mean, &rounds);
+	let error = stddev / (n as f64).sqrt();
+	
+	println!("|    All | {:>7.0} ms | {:>6.2} ms | {:>6.2} ms |", mean, error, stddev);
+}
+
 fn print_perf(day: u32, part: &str, rounds: Vec<std::time::Duration>, n: u32) {
 	let mean = mean(&rounds);
 	let stddev = stddeviation(mean, &rounds);
 	let error = stddev / (n as f64).sqrt();
 
-	println!("| D{:02} {:} | {:>7.2} ms | {:.4} ms | {:.4} ms |", day, part, mean, error, stddev);
+	println!("| D{:02} {:} | {:>7.2} ms | {:>6.4} ms | {:>6.4} ms |", day, part, mean, error, stddev);
 }
 
 fn mean(list: &Vec<std::time::Duration>) -> f64 {
