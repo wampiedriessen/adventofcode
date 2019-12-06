@@ -86,7 +86,10 @@ fn main() {
 	panic!("Usage is wrong");
 }
 
-fn get_day(day:u32, input: &str) -> Box<dyn Day> {
+fn get_day(day:u32) -> Box<dyn Day> {
+	let inputfile = format!("../inputs/day{:02}.txt", day);
+	let input = load_str!(inputfile.as_str()).trim();
+
 	match day {
 		01 => return Box::new(day01::Day01::new(input)),
 		02 => return Box::new(day02::Day02::new(input)),
@@ -118,9 +121,7 @@ fn get_day(day:u32, input: &str) -> Box<dyn Day> {
 }
 
 fn run(day: u32, part: u32, perf: bool, in_loop_of_multiple: bool) {
-	let inputfile = format!("../inputs/day{:02}.txt", day);
-	let input = load_str!(inputfile.as_str()).trim();
-	let solution = get_day(day, input);
+	let solution = get_day(day);
 
 	if perf {
 		perf_internal(solution, day, part, in_loop_of_multiple);
@@ -145,21 +146,27 @@ fn perf_internal(solution: Box<dyn Day>, day: u32, part: u32, in_loop_of_multipl
 	let n = 20;
 
 	if !in_loop_of_multiple || day == 1 || day == 13 {
-		println!("|----------|----------|-----------|-----------|");
-		println!("|  Puzzle  |     Mean |     Error |    StdDev |");
+		println!("|--------|------------|-----------|-----------|");
+		println!("| Puzzle |       Mean |     Error |    StdDev |");
 	}
-	println!("|----------|----------|-----------|-----------|");
+	println!("|--------|------------|-----------|-----------|");
 
 	match part {
 		0 => {
 			let rounds1 = (0..n).map(|_| perf_one(&solution, 1)).collect();
-			print_perf(day, 1, rounds1, n);
+			print_perf(day, "p1", rounds1, n);
 			let rounds2 = (0..n).map(|_| perf_one(&solution, 2)).collect();
-			print_perf(day, 2, rounds2, n);
+			print_perf(day, "p2", rounds2, n);
+
+			let rounds_full1 = (0..n).map(|_| perf_one_full(day, 1)).collect();
+			print_perf(day, "f1", rounds_full1, n);
+
+			let rounds_full2 = (0..n).map(|_| perf_one_full(day, 2)).collect();
+			print_perf(day, "f1", rounds_full2, n);
 		}
 		x => {
 			let rounds = (0..n).map(|_| perf_one(&solution, x)).collect();
-			print_perf(day, x, rounds, n);
+			print_perf(day, &x.to_string(), rounds, n);
 		},
 	}
 }
@@ -174,22 +181,33 @@ fn perf_one(solution: &Box<dyn Day>, part:u32) -> std::time::Duration {
 	return start.elapsed();
 }
 
-fn print_perf(day: u32, part: u32, rounds: Vec<std::time::Duration>, n: u32) {
+fn perf_one_full(day: u32, part:u32) -> std::time::Duration {
+	let start = Instant::now();
+	let day = get_day(day);
+	match part {
+		1 => { let _ = day.part1(); },
+		2 => { let _ = day.part2(); },
+		_ => panic!("Unknown part"),
+	}
+	return start.elapsed();
+}
+
+fn print_perf(day: u32, part: &str, rounds: Vec<std::time::Duration>, n: u32) {
 	let mean = mean(&rounds);
 	let stddev = stddeviation(mean, &rounds);
 	let error = stddev / (n as f64).sqrt();
 
-	println!("|  D{:02} p{}  | {:>5.0} ms | {:.4} ms | {:.4} ms |", day, part, mean, error, stddev);
+	println!("| D{:02} {:} | {:>7.2} ms | {:.4} ms | {:.4} ms |", day, part, mean, error, stddev);
 }
 
 fn mean(list: &Vec<std::time::Duration>) -> f64 {
-    let sum: u128 = Iterator::sum(list.iter().map(|d| d.as_millis()));
-    f64::from(sum as u32) / (list.len() as f64)
+    let sum: u128 = Iterator::sum(list.iter().map(|d| d.as_micros()));
+    return f64::from(sum as u32 / 1000) / (list.len() as f64);
 }
 
 fn stddeviation(mean: f64, list: &Vec<std::time::Duration>) -> f64 {
 	return list.iter()
-		.map(|v| f64::from(v.as_millis()as u32))
+		.map(|v| f64::from(v.as_micros() as u32 / 1000))
 		.map(|v| (v - mean)*(v - mean))
 		.sum::<f64>() / (list.len() - 1) as f64;
 }
