@@ -42,11 +42,9 @@ impl Day02 {
   }
 
   fn run2(&self, goal: i64) -> i64 {
-    let orig_program = self.input.clone();
-
     for noun in 0..100 {
         for verb in 0..100 {
-            let mut program = orig_program.clone();
+            let mut program = self.input.clone();
             program[1] = noun;
             program[2] = verb;
 

@@ -149,10 +149,10 @@ fn perf_internal(solution: Box<dyn Day>, day: u32, part: u32, in_loop_of_multipl
 	let n = 100;
 
 	if !in_loop_of_multiple || day == 1 || day == 13 {
-		println!("|--------|------------|-----------|-----------|");
-		println!("| Puzzle |       Mean |     Error |    StdDev |");
+		println!("|--------|------------|-----------|------------|");
+		println!("| Puzzle |       Mean |     Error |     StdDev |");
 	}
-	println!("|--------|------------|-----------|-----------|");
+	println!("|--------|------------|-----------|------------|");
 
 	match part {
 		0 => {
@@ -198,9 +198,9 @@ fn perf_one_full(day: u32, part:u32) -> std::time::Duration {
 fn perf_all_full() {
 	let n = 100;
 
-	println!("|--------|------------|-----------|-----------|");
-	println!("| Puzzle |       Mean |     Error |    StdDev |");
-	println!("|--------|------------|-----------|-----------|");
+	println!("|--------|------------|-----------|------------|");
+	println!("| Puzzle |       Mean |     Error |     StdDev |");
+	println!("|--------|------------|-----------|------------|");
 
 	let rounds = (0..n).map(|_| {
 		let start = Instant::now();
@@ -216,7 +216,7 @@ fn perf_all_full() {
 	let stddev = stddeviation(mean, &rounds);
 	let error = stddev / (n as f64).sqrt();
 	
-	println!("|    All | {:>7.0} ms | {:>6.2} ms | {:>6.2} ms |", mean, error, stddev);
+	println!("|    All | {:>7.0} ms | {:>6.2} ms | {:>7.2} ms |", mean, error, stddev);
 }
 
 fn print_perf(day: u32, part: &str, rounds: Vec<std::time::Duration>, n: u32) {
@@ -224,7 +224,7 @@ fn print_perf(day: u32, part: &str, rounds: Vec<std::time::Duration>, n: u32) {
 	let stddev = stddeviation(mean, &rounds);
 	let error = stddev / (n as f64).sqrt();
 
-	println!("| D{:02} {:} | {:>7.2} ms | {:>6.4} ms | {:>6.4} ms |", day, part, mean, error, stddev);
+	println!("| D{:02} {:} | {:>7.2} ms | {:>6.4} ms | {:>7.4} ms |", day, part, mean, error, stddev);
 }
 
 fn mean(list: &Vec<std::time::Duration>) -> f64 {
