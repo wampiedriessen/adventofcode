@@ -23,15 +23,15 @@ impl Day for Day05 {
 
 // -- Privates
 impl Day05 {
-    fn run1(&self) -> i32 {
+    fn run1(&self) -> i64 {
         return self.boot_system_id(1);
     }
 
-    fn run2(&self) -> i32 {
+    fn run2(&self) -> i64 {
         return self.boot_system_id(5);
     }
 
-    fn boot_system_id(&self, system_id: i32) -> i32 {
+    fn boot_system_id(&self, system_id: i64) -> i64 {
         let mut t = Intcode::new(&self.input);
 
         t.stdin(system_id);

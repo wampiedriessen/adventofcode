@@ -1,12 +1,17 @@
 use std::collections::VecDeque;
 
-pub type IntcodeProg = Vec<i32>;
+pub type IntcodeProg = Vec<i64>;
+
+const FINISHED: u8 = 0;
+const WAITING_FOR_INPUT: u8 = 1;
+const RUNNING: u8 = 2;
 
 pub struct Intcode {
     pc: usize,
     ops: IntcodeProg,
-    read_queue: VecDeque<i32>,
-    write_queue: VecDeque<i32>,
+    read_queue: VecDeque<i64>,
+    write_queue: VecDeque<i64>,
+    state: u8,
 }
 
 impl Intcode {
@@ -16,19 +21,17 @@ impl Intcode {
             ops: program.clone(),
             read_queue: VecDeque::new(),
             write_queue: VecDeque::new(),
+            state: RUNNING,
         }
     }
 
     pub fn read_input(input:&str) -> IntcodeProg {
-        let mut vec: IntcodeProg = Vec::new();
-        for op in input.split(",") {
-            vec.push(op.parse().unwrap())
-        }
-        return vec;
+        return input.split(",").map(|x| x.parse().unwrap()).collect();
     }
 
     pub fn compute(&mut self) -> () {
-        while self.ops[self.pc] != 99 {
+        self.state = RUNNING;
+        while self.ops[self.pc] != 99 && self.state == RUNNING {
             let op = self.ops[self.pc] % 100;
 
             match op {
@@ -42,15 +45,22 @@ impl Intcode {
                 8   => self.op_eq(),
                 _   => panic!("Unknown opcode: {:?}!", op),
             }
+
+            if self.state == WAITING_FOR_INPUT { return; }
         }
+        self.state = FINISHED;
     }
 
-    pub fn result(&self) -> i32 {
+    pub fn result(&self) -> i64 {
         return self.ops[0];
     }
 
-    fn get_param(&self, par_num: usize) -> i32 {
-        let i = 10_i32.pow((par_num+1) as u32);
+    pub fn is_finished(&self) -> bool {
+        return self.state == FINISHED;
+    }
+
+    fn get_param(&self, par_num: usize) -> i64 {
+        let i = 10_i64.pow((par_num+1) as u32);
         let p_mode = (self.ops[self.pc] / i) % 10;
         let val = self.ops[self.pc+par_num];
 
@@ -62,42 +72,47 @@ impl Intcode {
     }
 
     fn op_add(&mut self) {
-        let a: i32 = self.get_param(1);
-        let b: i32 = self.get_param(2);
-        let dst: i32 = self.ops[self.pc+3];
+        let a: i64 = self.get_param(1);
+        let b: i64 = self.get_param(2);
+        let dst: i64 = self.ops[self.pc+3];
 
         self.ops[dst as usize] = a + b;
         self.pc += 4;
     }
 
     fn op_mul(&mut self) {
-        let a: i32 = self.get_param(1);
-        let b: i32 = self.get_param(2);
-        let dst: i32 = self.ops[self.pc+3];
+        let a: i64 = self.get_param(1);
+        let b: i64 = self.get_param(2);
+        let dst: i64 = self.ops[self.pc+3];
 
         self.ops[dst as usize] = a * b;
         self.pc += 4;
     }
 
     fn op_cin(&mut self) {
-        let dst: i32 = self.ops[self.pc+1];
-
-        self.ops[dst as usize] = self.io_read().unwrap();
-        self.pc += 2;
+        if let Some(input) = self.io_read() {
+            let dst: i64 = self.ops[self.pc+1];
+    
+            self.ops[dst as usize] = input;
+            self.pc += 2;
+            return;
+        }
+        // no input?: don't "UP" the PC, so this op runs again when started
+        self.state = WAITING_FOR_INPUT;
     }
 
     fn op_cout(&mut self) {
-        let src: i32 = self.get_param(1);
+        let src: i64 = self.get_param(1);
 
         self.io_write(src);
         self.pc += 2;
     }
 
     fn op_jump(&mut self, jump_if: bool) {
-        let a: i32 = self.get_param(1);
+        let a: i64 = self.get_param(1);
 
         if (a != 0) == jump_if {
-            let dst: i32 = self.get_param(2);
+            let dst: i64 = self.get_param(2);
             self.pc = dst as usize;
             return;
         }
@@ -106,9 +121,9 @@ impl Intcode {
     }
 
     fn op_lt(&mut self) {
-        let a: i32 = self.get_param(1);
-        let b: i32 = self.get_param(2);
-        let dst: i32 = self.ops[self.pc+3];
+        let a: i64 = self.get_param(1);
+        let b: i64 = self.get_param(2);
+        let dst: i64 = self.ops[self.pc+3];
 
         self.ops[dst as usize] = match a < b {
             true   => 1,
@@ -118,9 +133,9 @@ impl Intcode {
     }
 
     fn op_eq(&mut self) {
-        let a: i32 = self.get_param(1);
-        let b: i32 = self.get_param(2);
-        let dst: i32 = self.ops[self.pc+3];
+        let a: i64 = self.get_param(1);
+        let b: i64 = self.get_param(2);
+        let dst: i64 = self.ops[self.pc+3];
 
         self.ops[dst as usize] = match a == b {
             true   => 1,
@@ -129,26 +144,25 @@ impl Intcode {
         self.pc += 4;
     }
 
-
     // -- I/O stuff:
 
-    fn io_read(&mut self) -> Option<i32> {
+    fn io_read(&mut self) -> Option<i64> {
         if self.read_queue.is_empty() {
-            panic!("No input was given to intcode");
+            return None;
         }
 
         return self.read_queue.pop_front();
     }
 
-    fn io_write(&mut self, val: i32) {
-        self.write_queue.push_back(val);
-    }
-
-    pub fn stdin(&mut self, val: i32) {
+    pub fn stdin(&mut self, val: i64) {
         self.read_queue.push_back(val);
     }
 
-    pub fn stdout(&mut self) -> Option<i32> {
+    fn io_write(&mut self, val: i64) {
+        self.write_queue.push_back(val);
+    }
+
+    pub fn stdout(&mut self) -> Option<i64> {
         return self.write_queue.pop_front();
     }
 
@@ -174,7 +188,6 @@ mod tests {
 
   #[test]
   fn day02_tests() {
-    
     assert_eq!(vec![2,0,0,0,99], compute(vec![1,0,0,0,99]));
     assert_eq!(vec![2,3,0,6,99], compute(vec![2,3,0,3,99]));
     assert_eq!(vec![2,4,4,5,99,9801], compute(vec![2,4,4,5,99,0]));

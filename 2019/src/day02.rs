@@ -24,7 +24,7 @@ impl Day for Day02 {
 // -- Privates
 impl Day02 {
   
-  fn compute(&self, program: IntcodeProg) -> i32 {
+  fn compute(&self, program: IntcodeProg) -> i64 {
     let mut t = Intcode::new(&program);
 
     t.compute();
@@ -32,7 +32,7 @@ impl Day02 {
     return t.result();
   }
 
-  fn run1(&self) -> i32 {
+  fn run1(&self) -> i64 {
     let mut program = self.input.clone();
 
     program[1] = 12;
@@ -41,7 +41,7 @@ impl Day02 {
     return self.compute(program);
   }
 
-  fn run2(&self, goal: i32) -> i32 {
+  fn run2(&self, goal: i64) -> i64 {
     let orig_program = self.input.clone();
 
     for noun in 0..100 {
