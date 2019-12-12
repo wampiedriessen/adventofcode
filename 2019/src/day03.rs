@@ -1,4 +1,5 @@
 use super::Day;
+use super::util::Point;
 use std::collections::HashMap;
 use std::cmp::min;
 
@@ -23,12 +24,6 @@ impl Day for Day03 {
   fn part2(&self) -> Box<dyn std::fmt::Display> {
     return Box::new(self.run2());
   }
-}
-
-#[derive(PartialEq, Eq, Hash, Copy, Clone)]
-struct Point {
-    x: i32,
-    y: i32,
 }
 
 // -- Privates
