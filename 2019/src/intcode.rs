@@ -63,6 +63,14 @@ impl Intcode {
         return self.state == FINISHED;
     }
 
+    pub fn is_waiting(&self) -> bool {
+        return self.state == WAITING_FOR_INPUT;
+    }
+
+    pub fn has_output(&self) -> bool {
+        return self.write_queue.len() != 0;
+    }
+
     fn get_val(&mut self, pos: usize) -> IntcodeType {
         if pos >= self.ops.len() {
             self.ops.resize(pos+1, 0);
