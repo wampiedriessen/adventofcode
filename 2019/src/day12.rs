@@ -105,7 +105,7 @@ impl Day12 {
       i +=1;
     }
 
-    return i;
+    return i*2;
   }
 
   fn run1(&self) -> i32 {
@@ -122,18 +122,20 @@ impl Day12 {
 mod test {
   use super::*;
 
+  const EXAMPLE1: &str = "<x=-1, y=0, z=2>
+<x=2, y=-10, z=-7>
+<x=4, y=-8, z=8>
+<x=3, y=5, z=-1>";
+
   #[test]
   fn part1_example1()
   {
-    let day = Day12::new("<x=-1, y=0, z=2>
-<x=2, y=-10, z=-7>
-<x=4, y=-8, z=8>
-<x=3, y=5, z=-1>");
+    let day = Day12::new(EXAMPLE1);
 
     let (pos, vec) = day.moons_after_steps(10);
     let energy = day.get_energy(&pos, &vec);
 
-    assert_eq!(179, energy);
+    assert_eq!(energy, 179);
   }
 
   const EXAMPLE2: &str = "<x=-8, y=-10, z=0>
@@ -149,16 +151,26 @@ mod test {
     let (pos, vec) = day.moons_after_steps(100);
     let energy = day.get_energy(&pos, &vec);
 
-    assert_eq!(1940, energy);
+    assert_eq!(energy, 1940);
   }
-  
+
+  #[test]
+  fn part2_example1()
+  {
+    let day = Day12::new(EXAMPLE1);
+
+    let steps = day.steps_to_repeat_state();
+
+    assert_eq!(steps, 2772);
+  }
+  //
   // #[test]
   // fn part2_example2()
   // {
   //   let day = Day12::new(EXAMPLE2);
-
+  //
   //   let steps = day.steps_to_repeat_state();
-
+  //
   //   assert_eq!(4686774924, steps);
   // }
 }
