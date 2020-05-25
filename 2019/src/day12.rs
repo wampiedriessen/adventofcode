@@ -2,6 +2,7 @@ extern crate regex;
 
 use self::regex::{Regex, Captures};
 use super::Day;
+use util::lcm;
 
 pub struct Day12 {
   moons: [[i32; 3]; 4],
@@ -50,11 +51,15 @@ impl Day12 {
   }
 
   fn apply_gravity(&self, pos: &[[i32; 3]; 4], vel: &mut [[i32; 3]; 4]) -> () {
-    for i in 0..4 {
-      for j in 0..4 {
+    for i in 0..3 {
+      for j in i..4 {
         vel[i][0] += self.cmp(pos[i][0], pos[j][0]);
         vel[i][1] += self.cmp(pos[i][1], pos[j][1]);
         vel[i][2] += self.cmp(pos[i][2], pos[j][2]);
+
+        vel[j][0] += self.cmp(pos[j][0], pos[i][0]);
+        vel[j][1] += self.cmp(pos[j][1], pos[i][1]);
+        vel[j][2] += self.cmp(pos[j][2], pos[i][2]);
       }
     }
   }
@@ -91,26 +96,37 @@ impl Day12 {
     return energy;
   }
 
+  fn run1(&self) -> i32 {
+    let (pos, vel) = self.moons_after_steps(1000);
+    return self.get_energy(&pos, &vel);
+  }
+
   fn steps_to_repeat_state(&self) -> u64{
     let mut positions = self.moons.clone();
     let mut velocities = [[0; 3]; 4];
 
     self.apply_gravity(&positions, &mut velocities);
     self.apply_velocity(&mut positions, &velocities);
-    let mut i = 1;
+    let mut steps = 1;
+    let mut x = 0;
+    let mut y = 0;
+    let mut z = 0;
 
-    while velocities != [[0; 3]; 4] {
+    loop {
       self.apply_gravity(&positions, &mut velocities);
       self.apply_velocity(&mut positions, &velocities);
-      i +=1;
+      steps +=1;
+
+      if x == 0 && velocities.iter().all(|m| m[0] == 0) { x = steps; }
+      if y == 0 && velocities.iter().all(|m| m[1] == 0) { y = steps; }
+      if z == 0 && velocities.iter().all(|m| m[2] == 0) { z = steps; }
+
+      if x != 0 && y != 0 && z != 0 {
+        break;
+      }
     }
 
-    return i*2;
-  }
-
-  fn run1(&self) -> i32 {
-    let (pos, vel) = self.moons_after_steps(1000);
-    return self.get_energy(&pos, &vel);
+    return lcm(x, lcm(y, z)) * 2;
   }
 
   fn run2(&self) -> u64 {
@@ -163,14 +179,14 @@ mod test {
 
     assert_eq!(steps, 2772);
   }
-  //
-  // #[test]
-  // fn part2_example2()
-  // {
-  //   let day = Day12::new(EXAMPLE2);
-  //
-  //   let steps = day.steps_to_repeat_state();
-  //
-  //   assert_eq!(4686774924, steps);
-  // }
+  
+  #[test]
+  fn part2_example2()
+  {
+    let day = Day12::new(EXAMPLE2);
+  
+    let steps = day.steps_to_repeat_state();
+  
+    assert_eq!(steps, 4686774924);
+  }
 }
