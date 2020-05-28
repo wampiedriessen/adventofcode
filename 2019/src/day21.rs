@@ -30,3 +30,20 @@ impl Day21 {
         return 0;
     }
 }
+
+#[cfg(test)]
+mod test {
+  use super::*;
+
+  #[test]
+  fn part1() {
+    let day = Day21::new(include_str!("../inputs/day21.txt"));
+    assert_eq!(day.run1(), 0);
+  }
+
+  #[test]
+  fn part2() {
+    let day = Day21::new(include_str!("../inputs/day21.txt"));
+    assert_eq!(day.run2(), 0);
+  }
+}
