@@ -75,70 +75,70 @@ impl Day11 {
     return painted_panels;
   }
 
-    fn run2(&self) -> String {
-      let mut panels: HashMap<(i32,i32), bool> = HashMap::new();
+  fn run2(&self) -> String {
+    let mut panels: HashMap<(i32,i32), bool> = HashMap::new();
 
-      let mut bot = Intcode::new(&self.program);
-  
-      bot.stdin(1);
+    let mut bot = Intcode::new(&self.program);
+
+    bot.stdin(1);
+    bot.compute();
+
+    let mut min_x = 0;
+    let mut min_y = 0;
+    let mut max_x = 0;
+    let mut max_y = 0;
+
+    let mut x = 0;
+    let mut y = 0;
+    let mut dir = 0;
+
+    while let Some(paint) = bot.stdout() {
+      let turn = bot.stdout().unwrap();
+
+      panels.insert((x, y), paint == 1);
+
+      if turn == 0 {
+        dir = (dir + 1) % 4;
+      } else {
+        dir = (dir + 3) % 4;
+      }
+
+      match dir {
+        0 => y -= 1,
+        1 => x -= 1,
+        2 => y += 1,
+        3 => x += 1,
+        _ => panic!("Unknown dir"),
+      }
+
+      min_x = min(x, min_x);
+      min_y = min(y, min_y);
+      max_x = max(x, max_x);
+      max_y = max(y, max_y);
+
+      let newpanel = match panels.get(&(x, y)) {
+        Some(x) => if *x { 1 } else { 0 },
+        None => 0,
+      };
+
+      bot.stdin(newpanel);
       bot.compute();
-  
-      let mut min_x = 0;
-      let mut min_y = 0;
-      let mut max_x = 0;
-      let mut max_y = 0;
-
-      let mut x = 0;
-      let mut y = 0;
-      let mut dir = 0;
-  
-      while let Some(paint) = bot.stdout() {
-        let turn = bot.stdout().unwrap();
-
-        panels.insert((x, y), paint == 1);
-  
-        if turn == 0 {
-          dir = (dir + 1) % 4;
-        } else {
-          dir = (dir + 3) % 4;
-        }
-  
-        match dir {
-          0 => y -= 1,
-          1 => x -= 1,
-          2 => y += 1,
-          3 => x += 1,
-          _ => panic!("Unknown dir"),
-        }
-
-        min_x = min(x, min_x);
-        min_y = min(y, min_y);
-        max_x = max(x, max_x);
-        max_y = max(y, max_y);
-  
-        let newpanel = match panels.get(&(x, y)) {
-          Some(x) => if *x { 1 } else { 0 },
-          None => 0,
-        };
-  
-        bot.stdin(newpanel);
-        bot.compute();
-      }
-
-      let mut identifier: String = String::new();
-
-      for b in min_y..(max_y+1) {
-        for a in min_x..(max_x+1) {
-          identifier.push(match panels.get(&(a, b)) {
-            Some(p) => if *p { '#' } else { ' ' },
-            None => ' ',
-          });
-        }
-        identifier.push('\n');
-      }
-
-      return identifier;
     }
+
+    let mut identifier: String = String::new();
+
+    for b in min_y..(max_y+1) {
+      for a in min_x..(max_x+1) {
+        identifier.push(match panels.get(&(a, b)) {
+          Some(p) => if *p { '#' } else { ' ' },
+          None => ' ',
+        });
+      }
+      identifier.push('\n');
+    }
+
+    return identifier;
+  }
 }
 
 #[cfg(test)]

@@ -116,3 +116,22 @@ impl Day13 {
     return score;
   }
 }
+
+#[cfg(test)]
+mod test {
+  use super::*;
+
+  #[test]
+  fn part1() {
+    let day = Day13::new(include_str!("../inputs/day13.txt"));
+
+    assert_eq!(day.run1(), 329);
+  }
+
+  #[test]
+  fn part2() {
+    let day = Day13::new(include_str!("../inputs/day13.txt"));
+
+    assert_eq!(day.run2(), 15973);
+  }
+}

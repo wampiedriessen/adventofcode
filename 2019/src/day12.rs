@@ -189,4 +189,20 @@ mod test {
   
     assert_eq!(steps, 4686774924);
   }
+  
+  #[test]
+  fn part1()
+  {
+    let day = Day12::new(include_str!("../inputs/day12.txt"));
+  
+    assert_eq!(day.run1(), 6220);
+  }
+  
+  #[test]
+  fn part2()
+  {
+    let day = Day12::new(include_str!("../inputs/day12.txt"));
+  
+    assert_eq!(day.run2(), 548525804273976);
+  }
 }

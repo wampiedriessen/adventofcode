@@ -18,3 +18,7 @@ pub fn gcd(x: u64, y: u64) -> u64 {
 pub fn lcm(a: u64, b: u64) -> u64 {
     a * b / gcd(a, b)
 }
+
+pub fn ceil_divide(a: i64, b: i64) -> i64 {
+    return a / b + if a % b == 0 { 0 } else { 1 };
+}
