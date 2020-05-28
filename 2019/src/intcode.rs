@@ -29,6 +29,9 @@ impl Intcode {
     }
 
     pub fn read_input(input:&str) -> IntcodeProg {
+        if input.is_empty() {
+            panic!("No readable Intcode program found!");
+        }
         return input.split(",").map(|x| x.parse().unwrap()).collect();
     }
 
