@@ -57,7 +57,11 @@ fn main() {
 			perf_all_full();
 			return;
 		}
-		let day = args[1].parse().unwrap();
+
+		let day = match args[1].parse() {
+			Ok(x) => x,
+			Err(_) => panic!("Please use `#day`, `perf #day` or `perfall`"),
+		};
 		run(day, 0, false, false);
 		return;
 	}
