@@ -52,11 +52,11 @@ impl Day16 {
           let take = row + 1;
 
           let (_, relevant) = lists[i%2].split_at(row);
-      
+
           let chunks = relevant.chunks(take*2);
 
           let sum = self.get_val_for_chunks(chunks, take);
-      
+
           self.get_last(sum)
       }).collect();
     }
@@ -75,25 +75,23 @@ impl Day16 {
   fn fft_for_padding_more_than_half(&self, padding: usize, repeats: usize) -> u32 {
     let listlen = self.input.len() * repeats;
 
-    let mut cur: Vec<u32> = self.input.repeat(repeats).iter().skip(padding).map(|x| *x).collect();
-    let mut prev: Vec<u32> = cur.clone();
+    if padding < listlen / 2 {
+      panic!("Trick for FFT only works for padding larger than half the signal");
+    }
+
+    let mut vec: Vec<u32> = self.input.repeat(repeats).iter().skip(padding).map(|x| *x).collect();
 
     let remainderlen = listlen - padding;
 
     for _ in 0..100 {
+      let mut last = 0;
       for j in (0..remainderlen).rev() {
-        if j == (remainderlen-1) {
-          cur[j] = prev[j];
-        } else {
-          cur[j] = (prev[j] + cur[j + 1]) % 10;
-        }
+        vec[j] = (vec[j] + last) % 10;
+        last = vec[j];
       }
-      let t = cur;
-      cur = prev;
-      prev = t;
     }
 
-    self.get_answer(&prev, 8, 0)
+    self.get_answer(&vec, 8, 0)
   }
 
   fn run2(&self) -> u32 {
