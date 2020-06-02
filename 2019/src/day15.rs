@@ -1,5 +1,6 @@
 use super::intcode::*;
 use super::Day;
+use super::headings as h;
 
 use std::collections::HashMap;
 use std::collections::VecDeque;
@@ -8,11 +9,6 @@ const WALL: i64 = 0;
 const FLOOR: i64 = 1;
 const TARGET: i64 = 2;
 const HASBEEN: i64 = 9;
-
-const NORTH: i64 = 1;
-const SOUTH: i64 = 2;
-const WEST: i64 = 3;
-const EAST: i64 = 4;
 
 pub struct Day15 {
   input: IntcodeProg
@@ -36,29 +32,9 @@ impl Day for Day15 {
 
 // -- Privates
 impl Day15 {
-  fn alter_xy(&self, dir: i64, x: i32, y: i32) -> (i32, i32) {
-    match dir {
-      NORTH => (x, y+1),
-      SOUTH => (x, y-1),
-      WEST => (x+1, y),
-      EAST => (x-1, y),
-      _ => panic!("Unknown Direction!")
-    }
-  }
-
-  fn reverse_dir(&self, dir: i64) -> i64 {
-    match dir {
-      NORTH => SOUTH,
-      SOUTH => NORTH,
-      WEST => EAST,
-      EAST => WEST,
-      _ => panic!("Unknown Direction!")
-    }
-  }
-
   fn recursive_compute(&self, map: &mut HashMap<(i32, i32), i64>, p: &mut Intcode, x: i32, y: i32) {
     for dir in 1..5 {
-      let (new_x, new_y) = self.alter_xy(dir, x, y);
+      let (new_x, new_y) = h::update_location(dir, x, y);
       if map.contains_key(&(new_x, new_y)) { continue; }
 
       p.stdin(dir);
@@ -69,7 +45,7 @@ impl Day15 {
       if tile != WALL {
         self.recursive_compute(map, p, new_x, new_y);
 
-        p.stdin(self.reverse_dir(dir));
+        p.stdin(h::reverse_heading(dir).unwrap());
         p.compute();
         let _ = p.stdout();
       }
@@ -81,7 +57,7 @@ impl Day15 {
     *cur_loc = HASBEEN;
 
     for dir in 1..5 {
-      let (new_x, new_y) = self.alter_xy(dir, x, y);
+      let (new_x, new_y) = h::update_location(dir, x, y);
 
       let next = match map.get(&(new_x, new_y)) {
         Some(&HASBEEN) => continue,
@@ -114,7 +90,7 @@ impl Day15 {
     *cur_loc = HASBEEN;
 
     for dir in 1..5 {
-      let (new_x, new_y) = self.alter_xy(dir, x, y);
+      let (new_x, new_y) = h::update_location(dir, x, y);
 
       match map.get(&(new_x, new_y)) {
         Some(&HASBEEN) => continue,
