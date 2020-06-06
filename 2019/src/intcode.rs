@@ -28,11 +28,15 @@ impl Intcode {
         }
     }
 
-    pub fn read_input(input:&str) -> IntcodeProg {
+    pub fn read_input(input: &str) -> IntcodeProg {
         if input.is_empty() {
             panic!("No readable Intcode program found!");
         }
-        return input.split(",").map(|x| x.parse().unwrap()).collect();
+        return input
+            .trim()
+            .split(",")
+            .map(|x| x.parse().unwrap())
+            .collect();
     }
 
     pub fn compute(&mut self) -> () {
@@ -41,19 +45,21 @@ impl Intcode {
             let op = self.ops[self.pc] % 100;
 
             match op {
-                1   => self.op_add(),
-                2   => self.op_mul(),
-                3   => self.op_cin(),
-                4   => self.op_cout(),
-                5   => self.op_jump(|a| a != 0),
-                6   => self.op_jump(|a| a == 0),
-                7   => self.op_cmp(|a,b| a < b),
-                8   => self.op_cmp(|a,b| a == b),
-                9   => self.op_adjust_rel_base(),
-                _   => panic!("Unknown opcode: {:?}!", op),
+                1 => self.op_add(),
+                2 => self.op_mul(),
+                3 => self.op_cin(),
+                4 => self.op_cout(),
+                5 => self.op_jump(|a| a != 0),
+                6 => self.op_jump(|a| a == 0),
+                7 => self.op_cmp(|a, b| a < b),
+                8 => self.op_cmp(|a, b| a == b),
+                9 => self.op_adjust_rel_base(),
+                _ => panic!("Unknown opcode: {:?}!", op),
             }
 
-            if self.state == WAITING_FOR_INPUT { return; }
+            if self.state == WAITING_FOR_INPUT {
+                return;
+            }
         }
         self.state = FINISHED;
     }
@@ -76,30 +82,30 @@ impl Intcode {
 
     fn get_val(&mut self, pos: usize) -> IntcodeType {
         if pos >= self.ops.len() {
-            self.ops.resize(pos+1, 0);
+            self.ops.resize(pos + 1, 0);
             return 0;
         }
         return self.ops[pos];
     }
 
     fn get_param(&self, par_num: usize) -> usize {
-        let i = 10_i64.pow((par_num+1) as u32);
+        let i = 10_i64.pow((par_num + 1) as u32);
         let p_mode = (self.ops[self.pc] / i) % 10;
-        let index = self.pc+par_num;
+        let index = self.pc + par_num;
         let val = self.ops[index];
 
         return match p_mode {
             0 => val as usize,
             1 => index,
             2 => (self.relative_base + val) as usize,
-            _ => panic!("Unknown parameter mode")
-        }
+            _ => panic!("Unknown parameter mode"),
+        };
     }
 
     fn set_val(&mut self, pos: usize, val: IntcodeType) -> () {
         // println!("p: {}, v:{}", pos, val);
         if pos >= self.ops.len() {
-            self.ops.resize(pos+1, 0);
+            self.ops.resize(pos + 1, 0);
         }
         self.ops[pos] = val;
     }
@@ -125,7 +131,6 @@ impl Intcode {
     fn op_cin(&mut self) {
         if let Some(input) = self.io_read() {
             let dst: usize = self.get_param(1);
-    
             self.set_val(dst, input);
             self.pc += 2;
             return;
@@ -141,7 +146,10 @@ impl Intcode {
         self.pc += 2;
     }
 
-    fn op_jump<F>(&mut self, predicate: F) -> () where F : Fn(IntcodeType) -> bool {
+    fn op_jump<F>(&mut self, predicate: F) -> ()
+    where
+        F: Fn(IntcodeType) -> bool,
+    {
         let a: IntcodeType = self.get_val(self.get_param(1));
 
         if predicate(a) {
@@ -152,12 +160,15 @@ impl Intcode {
         self.pc += 3;
     }
 
-    fn op_cmp<F>(&mut self, predicate: F) -> () where F : Fn(IntcodeType, IntcodeType) -> bool {
+    fn op_cmp<F>(&mut self, predicate: F) -> ()
+    where
+        F: Fn(IntcodeType, IntcodeType) -> bool,
+    {
         let a: IntcodeType = self.get_val(self.get_param(1));
         let b: IntcodeType = self.get_val(self.get_param(2));
         let dst: usize = self.get_param(3);
 
-        if predicate(a,b) {
+        if predicate(a, b) {
             self.set_val(dst, 1);
         } else {
             self.set_val(dst, 0);
@@ -207,110 +218,114 @@ impl Intcode {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  fn compute(program: IntcodeProg) -> IntcodeProg {
-    let mut t = Intcode::new(&program);
+    fn compute(program: IntcodeProg) -> IntcodeProg {
+        let mut t = Intcode::new(&program);
 
-    t.compute();
+        t.compute();
 
-    return t.ops;
-  }
+        return t.ops;
+    }
 
-  #[test]
-  fn day02_tests() {
-    assert_eq!(vec![2,0,0,0,99], compute(vec![1,0,0,0,99]));
-    assert_eq!(vec![2,3,0,6,99], compute(vec![2,3,0,3,99]));
-    assert_eq!(vec![2,4,4,5,99,9801], compute(vec![2,4,4,5,99,0]));
-    assert_eq!(vec![30,1,1,4,2,5,6,0,99], compute(vec![1,1,1,4,99,5,6,0,99]));
-  }
+    #[test]
+    fn day02_tests() {
+        assert_eq!(vec![2, 0, 0, 0, 99], compute(vec![1, 0, 0, 0, 99]));
+        assert_eq!(vec![2, 3, 0, 6, 99], compute(vec![2, 3, 0, 3, 99]));
+        assert_eq!(vec![2, 4, 4, 5, 99, 9801], compute(vec![2, 4, 4, 5, 99, 0]));
+        assert_eq!(
+            vec![30, 1, 1, 4, 2, 5, 6, 0, 99],
+            compute(vec![1, 1, 1, 4, 99, 5, 6, 0, 99])
+        );
+    }
 
-  #[test]
-  fn jump_position_mode_tests() {
-    // Position mode jump
-    let prog_jump_pos = vec![3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9];
+    #[test]
+    fn jump_position_mode_tests() {
+        // Position mode jump
+        let prog_jump_pos = vec![3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9];
 
-    let mut t = Intcode::new(&prog_jump_pos);
-    t.stdin(0);
-    t.compute();
-    assert_eq!(0, t.stdout().unwrap());
+        let mut t = Intcode::new(&prog_jump_pos);
+        t.stdin(0);
+        t.compute();
+        assert_eq!(0, t.stdout().unwrap());
 
-    t = Intcode::new(&prog_jump_pos);
-    t.stdin(-17);
-    t.compute();
-    assert_eq!(1, t.stdout().unwrap());
-  }
+        t = Intcode::new(&prog_jump_pos);
+        t.stdin(-17);
+        t.compute();
+        assert_eq!(1, t.stdout().unwrap());
+    }
 
-  #[test]
-  fn jump_immediate_mode_tests() {
-    // Immediate mode jump
-    let prog_jump_imm = vec![3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9];
+    #[test]
+    fn jump_immediate_mode_tests() {
+        // Immediate mode jump
+        let prog_jump_imm = vec![3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9];
 
-    let mut t = Intcode::new(&prog_jump_imm);
-    t.stdin(0);
-    t.compute();
-    assert_eq!(0, t.stdout().unwrap());
+        let mut t = Intcode::new(&prog_jump_imm);
+        t.stdin(0);
+        t.compute();
+        assert_eq!(0, t.stdout().unwrap());
 
-    t = Intcode::new(&prog_jump_imm);
-    t.stdin(-17);
-    t.compute();
-    assert_eq!(1, t.stdout().unwrap());
-  }
+        t = Intcode::new(&prog_jump_imm);
+        t.stdin(-17);
+        t.compute();
+        assert_eq!(1, t.stdout().unwrap());
+    }
 
-  #[test]
-  fn jump_complicated_example_tests() {
-    // More complicated Jump example
-    let prog_jump = vec![3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
-    1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
-    999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99];
+    #[test]
+    fn jump_complicated_example_tests() {
+        // More complicated Jump example
+        let prog_jump = vec![
+            3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31, 1106, 0, 36, 98, 0,
+            0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104, 999, 1105, 1, 46, 1101, 1000, 1, 20, 4,
+            20, 1105, 1, 46, 98, 99,
+        ];
 
-    let mut t = Intcode::new(&prog_jump);
-    t.stdin(1);
-    t.compute();
-    assert_eq!(999, t.stdout().unwrap());
+        let mut t = Intcode::new(&prog_jump);
+        t.stdin(1);
+        t.compute();
+        assert_eq!(999, t.stdout().unwrap());
 
-    t = Intcode::new(&prog_jump);
-    t.stdin(8);
-    t.compute();
-    assert_eq!(1000, t.stdout().unwrap());
+        t = Intcode::new(&prog_jump);
+        t.stdin(8);
+        t.compute();
+        assert_eq!(1000, t.stdout().unwrap());
 
-    t = Intcode::new(&prog_jump);
-    t.stdin(11);
-    t.compute();
-    assert_eq!(1001, t.stdout().unwrap());
-  }
+        t = Intcode::new(&prog_jump);
+        t.stdin(11);
+        t.compute();
+        assert_eq!(1001, t.stdout().unwrap());
+    }
 
-  #[test]
-  fn quine_test()
-  {
-      let prog = vec![109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99];
-      let mut t = Intcode::new(&prog);
-      t.compute();
+    #[test]
+    fn quine_test() {
+        let prog = vec![
+            109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99,
+        ];
+        let mut t = Intcode::new(&prog);
+        t.compute();
 
-      let mut i = 0;
-      while let Some(x) = t.stdout() {
-        assert_eq!(prog[i], x);
-        i += 1;
-      }
-  }
+        let mut i = 0;
+        while let Some(x) = t.stdout() {
+            assert_eq!(prog[i], x);
+            i += 1;
+        }
+    }
 
-  #[test]
-  fn test_bigint()
-  {
-        let prog = vec![1102,34915192,34915192,7,4,7,99,0];
+    #[test]
+    fn test_bigint() {
+        let prog = vec![1102, 34915192, 34915192, 7, 4, 7, 99, 0];
         let mut t = Intcode::new(&prog);
         t.compute();
 
         assert_eq!(1219070632396864, t.stdout().unwrap());
-  }
+    }
 
-  #[test]
-  fn test_bigint2()
-  {
-    let prog = vec![104,1125899906842624,99];
-    let mut t = Intcode::new(&prog);
-    t.compute();
+    #[test]
+    fn test_bigint2() {
+        let prog = vec![104, 1125899906842624, 99];
+        let mut t = Intcode::new(&prog);
+        t.compute();
 
-    assert_eq!(1125899906842624, t.stdout().unwrap());
-  }
+        assert_eq!(1125899906842624, t.stdout().unwrap());
+    }
 }
