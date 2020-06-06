@@ -7,10 +7,10 @@ pub const EAST: Heading = 4;
 
 pub fn update_location(heading: Heading, x: i32, y: i32) -> (i32, i32) {
     match heading {
-        NORTH => (x, y+1),
-        SOUTH => (x, y-1),
-        WEST => (x+1, y),
-        EAST => (x-1, y),
+        NORTH => (x, y-1),
+        SOUTH => (x, y+1),
+        WEST => (x-1, y),
+        EAST => (x+1, y),
         _ => panic!("Unknown Heading!")
     }
 }
