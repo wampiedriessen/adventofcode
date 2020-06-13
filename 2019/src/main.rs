@@ -1,4 +1,5 @@
-#[macro_use] extern crate lazy_static;
+#[macro_use]
+extern crate lazy_static;
 mod day01;
 mod day02;
 mod day03;
@@ -28,13 +29,15 @@ mod headings;
 mod intcode;
 mod util;
 
-use std::time::Instant;
 use std::env;
+use std::time::Instant;
 
 trait Day {
-    fn new(input: &str) -> Self where Self: Sized;
-    fn part1(&self) -> Box<dyn std::fmt::Display>;
-    fn part2(&self) -> Box<dyn std::fmt::Display>;
+	fn new(input: &str) -> Self
+	where
+		Self: Sized;
+	fn part1(&self) -> Box<dyn std::fmt::Display>;
+	fn part2(&self) -> Box<dyn std::fmt::Display>;
 }
 
 fn main() {
@@ -53,8 +56,7 @@ fn main() {
 				run(day, 0, true, true);
 			}
 			return;
-		}
-		else if args[1] == "perfall" {
+		} else if args[1] == "perfall" {
 			perf_all_full();
 			return;
 		}
@@ -94,7 +96,7 @@ fn main() {
 	panic!("Usage is wrong");
 }
 
-fn get_day(day:u32) -> Box<dyn Day> {
+fn get_day(day: u32) -> Box<dyn Day> {
 	// relative to working directory, NOT executable
 	let inputfile = format!("inputs/day{:02}.txt", day);
 	let content = std::fs::read_to_string(inputfile).unwrap();
@@ -177,26 +179,34 @@ fn perf_internal(solution: Box<dyn Day>, day: u32, part: u32, in_loop_of_multipl
 		x => {
 			let rounds = (0..n).map(|_| perf_one(&solution, x)).collect();
 			print_perf(day, &x.to_string(), rounds, n);
-		},
+		}
 	}
 }
 
-fn perf_one(solution: &Box<dyn Day>, part:u32) -> std::time::Duration {
+fn perf_one(solution: &Box<dyn Day>, part: u32) -> std::time::Duration {
 	let start = Instant::now();
 	match part {
-		1 => { let _ = solution.part1(); },
-		2 => { let _ = solution.part2(); },
+		1 => {
+			let _ = solution.part1();
+		}
+		2 => {
+			let _ = solution.part2();
+		}
 		_ => panic!("Unknown part"),
 	}
 	return start.elapsed();
 }
 
-fn perf_one_full(day: u32, part:u32) -> std::time::Duration {
+fn perf_one_full(day: u32, part: u32) -> std::time::Duration {
 	let start = Instant::now();
 	let day = get_day(day);
 	match part {
-		1 => { let _ = day.part1(); },
-		2 => { let _ = day.part2(); },
+		1 => {
+			let _ = day.part1();
+		}
+		2 => {
+			let _ = day.part2();
+		}
 		_ => panic!("Unknown part"),
 	}
 	return start.elapsed();
@@ -209,21 +219,26 @@ fn perf_all_full() {
 	println!("| Puzzle |       Mean |     Error |     StdDev |");
 	println!("|--------|------------|-----------|------------|");
 
-	let rounds = (0..n).map(|_| {
-		let start = Instant::now();
-		for d in 1..26 {
-			let day = get_day(d);
-			day.part1();
-			day.part2();
-		}
-		return start.elapsed();
-	}).collect();
+	let rounds = (0..n)
+		.map(|_| {
+			let start = Instant::now();
+			for d in 1..26 {
+				let day = get_day(d);
+				day.part1();
+				day.part2();
+			}
+			return start.elapsed();
+		})
+		.collect();
 
 	let mean = mean(&rounds);
 	let stddev = stddeviation(mean, &rounds);
 	let error = stddev / (n as f64).sqrt();
-	
-	println!("|    All | {:>7.0} ms | {:>6.2} ms | {:>7.2} ms |", mean, error, stddev);
+
+	println!(
+		"|    All | {:>7.0} ms | {:>6.2} ms | {:>7.2} ms |",
+		mean, error, stddev
+	);
 }
 
 fn print_perf(day: u32, part: &str, rounds: Vec<std::time::Duration>, n: u32) {
@@ -231,17 +246,22 @@ fn print_perf(day: u32, part: &str, rounds: Vec<std::time::Duration>, n: u32) {
 	let stddev = stddeviation(mean, &rounds);
 	let error = stddev / (n as f64).sqrt();
 
-	println!("| D{:02} {:} | {:>7.2} ms | {:>6.4} ms | {:>7.4} ms |", day, part, mean, error, stddev);
+	println!(
+		"| D{:02} {:} | {:>7.2} ms | {:>6.4} ms | {:>7.4} ms |",
+		day, part, mean, error, stddev
+	);
 }
 
 fn mean(list: &Vec<std::time::Duration>) -> f64 {
-    let sum: u128 = Iterator::sum(list.iter().map(|d| d.as_micros()));
-    return f64::from(sum as u32 / 1000) / (list.len() as f64);
+	let sum: u128 = Iterator::sum(list.iter().map(|d| d.as_micros()));
+	return f64::from(sum as u32 / 1000) / (list.len() as f64);
 }
 
 fn stddeviation(mean: f64, list: &Vec<std::time::Duration>) -> f64 {
-	return list.iter()
+	return list
+		.iter()
 		.map(|v| f64::from(v.as_micros() as u32 / 1000))
-		.map(|v| (v - mean)*(v - mean))
-		.sum::<f64>() / (list.len() - 1) as f64;
+		.map(|v| (v - mean) * (v - mean))
+		.sum::<f64>()
+		/ (list.len() - 1) as f64;
 }
