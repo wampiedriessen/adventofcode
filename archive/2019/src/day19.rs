@@ -1,13 +1,14 @@
 use super::Day;
+use intcode::{Intcode, IntcodeProg};
 
 pub struct Day19 {
-  _input: u32
+  input: IntcodeProg,
 }
 
 impl Day for Day19 {
-  fn new(_input: &str) -> Day19 {
+  fn new(input: &str) -> Day19 {
     Day19 {
-      _input: 0,
+      input: Intcode::read_input(input),
     }
   }
 
@@ -22,13 +23,26 @@ impl Day for Day19 {
 
 // -- Privates
 impl Day19 {
-    fn run1(&self) -> i32 {
-        return 0;
+  fn run1(&self) -> i32 {
+    let mut count = 0;
+    for x in 0..50 {
+      for y in 0..50 {
+        let mut p = Intcode::new(&self.input);
+        p.stdin(x);
+        p.stdin(y);
+        p.compute();
+        let x = p.stdout().unwrap();
+        if x == 1 {
+          count += 1;
+        }
+      }
     }
+    count
+  }
 
-    fn run2(&self) -> i32 {
-        return 0;
-    }
+  fn run2(&self) -> i32 {
+    return 0;
+  }
 }
 
 #[cfg(test)]
