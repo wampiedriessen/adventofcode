@@ -17,9 +17,19 @@ replace day2 v0.0.0 => ./day2
 require day3 v0.0.0
 
 replace day3 v0.0.0 => ./day3
+
 require day4 v0.0.0
+
 replace day4 v0.0.0 => ./day4
+
 require day5 v0.0.0
+
 replace day5 v0.0.0 => ./day5
+
 require day6 v0.0.0
+
 replace day6 v0.0.0 => ./day6
+
+require day7 v0.0.0
+
+replace day7 v0.0.0 => ./day7
