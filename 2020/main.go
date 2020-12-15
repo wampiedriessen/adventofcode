@@ -18,6 +18,7 @@ type Conf struct {
 
 func main() {
 	days := []Conf{
+		Conf {"Day 4", day4.Day{} },
 		Conf {"Day 3", day3.Day{} },
 		Conf {"Day 2", day2.Day{} },
 		Conf {"Day 1", day1.Day{} },
