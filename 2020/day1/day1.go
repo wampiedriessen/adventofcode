@@ -1,4 +1,4 @@
-package main
+package day1
 
 import (
 	"bufio"
@@ -9,20 +9,20 @@ import (
 	
 )
 
-type day1 struct {}
+type Day1 struct {}
 
-func (d day1) Run1() {
+func (d Day1) Run1() {
 	var parsedinput = parse()
 	fmt.Printf("%v\n", part1(parsedinput, 2020))
 }
 
-func (d day1) Run2() {
+func (d Day1) Run2() {
 	var parsedinput = parse()
 	fmt.Printf("%v\n", part2(parsedinput))
 }
 
 func parse() []int {
-    file, err := os.Open("inputs/day1")
+    file, err := os.Open("/home/wampie/git/adventofcode/2020/inputs/day1")
     if err != nil {
         log.Fatal(err)
     }

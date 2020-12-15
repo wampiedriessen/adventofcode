@@ -1,4 +1,4 @@
-package main
+package day1
 
 import "testing"
 
@@ -22,16 +22,20 @@ func Test2(t *testing.T) {
 	}
 }
 
-func Part1(t *testing.T) {
+func TestPart1(t *testing.T) {
 	var parsedinput = parse()
-	if part1(parsedinput, 2020) != 1015476 {
+	var val = part1(parsedinput, 2020)
+	t.Log(val)
+	if val != 1015476 {
 		t.Error("Regression on Day1 p1")
 	}
 }
 
-func Part2(t *testing.T) {
+func TestPart2(t *testing.T) {
 	var parsedinput = parse()
-	if part2(parsedinput) != 200878544 {
+	var val = part2(parsedinput)
+	t.Log(val)
+	if val != 200878544 {
 		t.Error("Regression on Day1 p2")
 	}
 }
