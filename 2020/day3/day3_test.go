@@ -1,25 +1,26 @@
-package day2
+package day3
 
-import "testing"
-
-var testinput = []string{
-	"1-3 a: abcde",
-	"1-3 b: cdefg",
-	"2-9 c: ccccccccc",
-	};
+import (
+	"helpers"
+	"testing"
+)
 
 func Test1(t *testing.T) {
-	var output = part1(testinput);
+	var input = helpers.GetListOfStrings("example1")
 
-	if output != 2 {
+	var output = part1(input);
+
+	if output != 7 {
 		t.Errorf("Not correct!: %v", output);
 	}
 }
 
 func Test2(t *testing.T) {
-	var output = part2(testinput);
+	var input = helpers.GetListOfStrings("example1")
 
-	if output != 1 {
+	var output = part2(input);
+
+	if output != 336 {
 		t.Errorf("Not correct!: %v", output);
 	}
 }
@@ -28,16 +29,16 @@ func TestPart1(t *testing.T) {
 	d := Day{}
 	val := d.Run1()
 	t.Log(val)
-	if val != "640" {
+	if val != "0" {
 		t.Error("Regression on p1")
 	}
 }
 
 func TestPart2(t *testing.T) {
 	d := Day{}
-	val := d.Run2()
+	val := d.Run2 ()
 	t.Log(val)
-	if val != "472" {
+	if val != "0" {
 		t.Error("Regression on p2")
 	}
 }

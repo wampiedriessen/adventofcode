@@ -13,3 +13,7 @@ replace day1 v0.0.0 => ./day1
 require day2 v0.0.0
 
 replace day2 v0.0.0 => ./day2
+
+require day3 v0.0.0
+
+replace day3 v0.0.0 => ./day3

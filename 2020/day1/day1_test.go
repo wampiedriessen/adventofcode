@@ -26,7 +26,7 @@ func TestPart1(t *testing.T) {
 	d := Day{}
 	val := d.Run1()
 	t.Log(val)
-	if val != 1015476 {
+	if val != "1015476" {
 		t.Error("Regression on Day1 p1")
 	}
 }
@@ -35,7 +35,7 @@ func TestPart2(t *testing.T) {
 	d := Day{}
 	val := d.Run2 ()
 	t.Log(val)
-	if val != 200878544 {
+	if val != "200878544" {
 		t.Error("Regression on Day1 p2")
 	}
 }
