@@ -1,19 +1,29 @@
 package main
 
 import (
-	"./day1"
+	"day2"
+	"day1"
+	"fmt"
 )
 
 type Day interface {
-	Run1()
-	Run2()
+	Run1() string
+	Run2() string
+}
+
+type Conf struct {
+	Name string
+	Day Day
 }
 
 func main() {
-	days := []Day{
-		day1.Day1{} }
+	days := []Conf{
+		Conf {"Day 2", day2.Day{} },
+		Conf {"Day 1", day1.Day{} },
+	}
 	for _, d := range days {
-		d.Run1();
-		d.Run2();
+		fmt.Println(d.Name)
+		fmt.Println(d.Day.Run1());
+		fmt.Println(d.Day.Run2());
 	}
 }

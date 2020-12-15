@@ -23,8 +23,8 @@ func Test2(t *testing.T) {
 }
 
 func TestPart1(t *testing.T) {
-	var parsedinput = parse()
-	var val = part1(parsedinput, 2020)
+	d := Day{}
+	val := d.Run1()
 	t.Log(val)
 	if val != 1015476 {
 		t.Error("Regression on Day1 p1")
@@ -32,8 +32,8 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	var parsedinput = parse()
-	var val = part2(parsedinput)
+	d := Day{}
+	val := d.Run2 ()
 	t.Log(val)
 	if val != 200878544 {
 		t.Error("Regression on Day1 p2")

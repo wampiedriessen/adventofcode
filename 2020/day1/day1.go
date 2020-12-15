@@ -1,46 +1,23 @@
 package day1
 
 import (
-	"bufio"
 	"fmt"
-	"log"
-	"os"
-	"strconv"
-	
+	"helpers"
 )
 
-type Day1 struct {}
+type Day struct {}
 
-func (d Day1) Run1() {
-	var parsedinput = parse()
-	fmt.Printf("%v\n", part1(parsedinput, 2020))
+var filename = "/home/wampie/git/adventofcode/2020/inputs/day1"
+
+func (d Day) Run1() string {
+	var parsedinput = helpers.GetListOfInts(filename)
+	return fmt.Sprint(part1(parsedinput, 2020))
 }
 
-func (d Day1) Run2() {
-	var parsedinput = parse()
-	fmt.Printf("%v\n", part2(parsedinput))
+func (d Day) Run2() string {
+	var parsedinput = helpers.GetListOfInts(filename)
+	return fmt.Sprint(part2(parsedinput))
 }
-
-func parse() []int {
-    file, err := os.Open("/home/wampie/git/adventofcode/2020/inputs/day1")
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	var result []int
-    for scanner.Scan() {
-		val, _ := strconv.Atoi(scanner.Text())
-        result = append(result, val)
-    }
-
-    if err := scanner.Err(); err != nil {
-        log.Fatal(err)
-	}
-	return result
-}
-
 
 func part1(arr []int, target int) int {
 	var i, j int;
