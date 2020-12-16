@@ -1,6 +1,7 @@
 package main
 
 import (
+	"day8"
 	"day7"
 	"day6"
 	"day5"
@@ -23,6 +24,7 @@ type Conf struct {
 
 func main() {
 	days := []Conf{
+		Conf {"Day 8", day8.Day{} },
 		Conf {"Day 7", day7.Day{} },
 		Conf {"Day 6", day6.Day{} },
 		Conf {"Day 5", day5.Day{} },

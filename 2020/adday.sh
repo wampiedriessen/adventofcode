@@ -93,9 +93,6 @@ EOF
 sed -i "s/DAYNAME/day$1/g" "day$1/go.mod"
 sed -i "s/DAYNAME/day$1/g" "day$1/day$1.go"
 sed -i "s/DAYNAME/day$1/g" "day$1/day$1_test.go"
-if ! grep -q "day$1" main.go; then
-    sed -i "20 a \		Conf {\"Day $1\", day$1.Day{} }," main.go
-fi
 if ! grep -q "day$1" go.mod; then
     echo "require day$1 v0.0.0" >> go.mod
     echo "replace day$1 v0.0.0 => ./day$1" >> go.mod
