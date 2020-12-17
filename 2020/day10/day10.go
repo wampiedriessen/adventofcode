@@ -61,21 +61,12 @@ func part2(arr []int) int {
 }
 
 func poss(num int) int {
-	switch num {
-		case 1:
-			return 1
-		case 2:
-			return 1
-		case 3:
-			return 2
-		case 4:
-			return 4
-		case 5:
-			return 7
-		case 6:
-			return 13
-		case 7:
-			return 27
+	if num == 1 || num == 2 {
+		return 1
 	}
-	return -1
+	if num == 3 {
+		return 2
+	}
+
+	return poss(num-1) + poss(num-2) + poss(num-3);
 }
