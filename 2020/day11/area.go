@@ -96,12 +96,18 @@ func (a *Area) Step() bool {
 
 	for i, y := range pState {
 		for j, x := range y {
-			count := getCount(pState, i, j)
+			var count int
+			if a.part2 {
+				count = getSeen(pState, i, j)
+			} else {
+				count = getCount(pState, i, j)
+			}
 			a.State()[i][j] = newState(x, count, a.GetTolerance())
 		}
 	}
 
 	state := a.GetStateHash()
+
 	if _, ok := a.prevStateHashes[state]; ok {
 		return false
 	}
@@ -110,27 +116,73 @@ func (a *Area) Step() bool {
 	return true
 }
 
-func getCount(state [][]Tile, y int, x int) int {
-	checkX := []int{ x }
-	checkY := []int{ y }
+type Coord struct{
+	x int
+	y int
+}
+
+var directions = []Coord{
+	{-1, -1},
+	{-1, 0},
+	{-1, 1},
+	{0, -1},
+	{0, 1},
+	{1, -1},
+	{1, 0},
+	{1, 1},
+}
+
+type LookingStruct struct{
+	x int
+	y int
+	solved bool
+}
+
+func getSeen(state [][]Tile, y int, x int) int {
 	count := 0
-	if x != 0 {
-		checkX = append(checkX, x-1)
+	solved := 0
+	var looking = make([]LookingStruct, 8)
+
+	for i, dir := range directions {
+		looking[i] = LookingStruct{dir.x, dir.y, false}
 	}
-	if x != len(state[0])-1 {
-		checkX = append(checkX, x+1)
-	}
-	if y != 0 {
-		checkY = append(checkY, y-1)
-	}
-	if y != len(state)-1 {
-		checkY = append(checkY, y+1)
-	}
-	for _, v := range checkX {
-		for _, w := range checkY {
-			if !(v == x && w ==y) && state[w][v] == Occupied{
+
+	for solved != 8 {
+		for i, dir := range looking {
+			if dir.solved {
+				continue
+			}
+			nx := x + dir.x
+			ny := y + dir.y
+			if ny < 0 || nx < 0 || ny >= len(state) || nx >= len(state[ny]) {
+				looking[i].solved = true
+				solved++
+				continue
+			}
+			if state[ny][nx] != Floor {
+				looking[i].solved = true
+				solved++
+			}
+			if state[ny][nx] == Occupied {
 				count++
 			}
+			looking[i].x += directions[i].x
+			looking[i].y += directions[i].y
+		}
+	}
+	return count
+}
+
+func getCount(state [][]Tile, y int, x int) int {
+	count := 0
+	for _, dir := range directions {
+		nx := x + dir.x
+		ny := y + dir.y
+		if ny < 0 || nx < 0 || ny >= len(state) || nx >= len(state[ny]) {
+			continue
+		}
+		if state[ny][nx] == Occupied {
+			count++
 		}
 	}
 	return count
