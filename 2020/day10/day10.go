@@ -3,7 +3,6 @@ package day10
 import (
 	"fmt"
 	"helpers"
-	// "math"
 	"sort"
 )
 
