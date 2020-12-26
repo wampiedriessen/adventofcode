@@ -6,6 +6,7 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 func GetListOfStrings(filename string) []string {
@@ -47,4 +48,13 @@ func CloneValue(source interface{}, destin interface{}) {
     } else {
         destin = x.Interface()
     }
+}
+
+func SplitStringToInts(Str string, Split string) []int {
+    a := strings.Split(Str, Split)
+    b := make([]int, len(a))
+    for i, v := range a {
+        b[i], _ = strconv.Atoi(v)
+    }
+    return b
 }

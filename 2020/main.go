@@ -14,6 +14,9 @@ import (
   "day10"
   "day11"
   "day12"
+  "day13"
+  "day14"
+  "day15"
 )
 
 type Day interface {
@@ -40,6 +43,9 @@ func main() {
       Conf {"Day 10", day10.Day{} },
       Conf {"Day 11", day11.Day{} },
       Conf {"Day 12", day12.Day{} },
+      Conf {"Day 13", day13.Day{} },
+      Conf {"Day 14", day14.Day{} },
+      Conf {"Day 15", day15.Day{} },
 	}
 	for _, d := range days {
 		fmt.Println(d.Name)
