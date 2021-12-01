@@ -65,3 +65,5 @@ replace day14 v0.0.0 => ./day14
 require day15 v0.0.0
 
 replace day15 v0.0.0 => ./day15
+require day16 v0.0.0
+replace day16 v0.0.0 => ./day16
