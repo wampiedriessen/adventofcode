@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Build
       run: cargo build --verbose
-      working-directory: ./2019
+      working-directory: ./2021
     - name: Run tests
       run: cargo test --verbose
-      working-directory: ./2019
+      working-directory: ./2021
