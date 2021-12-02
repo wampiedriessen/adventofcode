@@ -12,14 +12,14 @@ impl Day for Day02 {
         for line in &self.input {
             let split: Vec<&str> = line.split(' ').collect();
             let val = split[1].parse::<i32>().unwrap();
-            match split[0].as_bytes()[0] {
-                b'f' => {
+            match split[0] {
+                "forward" => {
                     horizontal += val;
                 }
-                b'd' => {
+                "down" => {
                     depth += val;
                 }
-                b'u' => {
+                "up" => {
                     depth -= val;
                 }
                 _ => panic!(),
@@ -37,15 +37,15 @@ impl Day for Day02 {
         for line in &self.input {
             let split: Vec<&str> = line.split(' ').collect();
             let val = split[1].parse::<i32>().unwrap();
-            match split[0].as_bytes()[0] {
-                b'f' => {
+            match split[0] {
+                "forward" => {
                     horizontal += val;
                     depth += aim * val;
                 }
-                b'd' => {
+                "down" => {
                     aim += val;
                 }
-                b'u' => {
+                "up" => {
                     aim -= val;
                 }
                 _ => panic!(),
