@@ -1,5 +1,5 @@
 mod day01;
-// mod day02;
+mod day02;
 // mod day03;
 // mod day04;
 // mod day05;
@@ -25,7 +25,7 @@ mod day01;
 // mod day25;
 
 use crate::day01::Day01;
-// use crate::day02::Day02;
+use crate::day02::Day02;
 // use crate::day03::Day03;
 // use crate::day04::Day04;
 // use crate::day05::Day05;
@@ -61,32 +61,32 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
 
     // Prints each argument on a separate line
-    let day = match args[1].as_str() {
-        "1" | "01" => Day01 { input: all_input() },
-        // "2" | "02" => Day02 { input },
-        // "3" | "03" => Day03 { input },
-        // "4" | "04" => Day04 { input },
-        // "5" | "05" => Day05 { input },
-        // "6" | "06" => Day06 { input },
-        // "7" | "07" => Day07 { input },
-        // "8" | "08" => Day08 { input },
-        // "9" | "09" => Day09 { input },
-        // "10" => Day10 { input },
-        // "11" => Day11 { input },
-        // "12" => Day12 { input },
-        // "13" => Day13 { input },
-        // "14" => Day14 { input },
-        // "15" => Day15 { input },
-        // "16" => Day16 { input },
-        // "17" => Day17 { input },
-        // "18" => Day18 { input },
-        // "19" => Day19 { input },
-        // "20" => Day20 { input },
-        // "21" => Day21 { input },
-        // "22" => Day22 { input },
-        // "23" => Day23 { input },
-        // "24" => Day24 { input },
-        // "25" => Day25 { input },
+    let day: Box<dyn Day> = match args[1].as_str() {
+        "1" | "01" => Box::new(Day01 { input: all_input() }),
+        "2" | "02" => Box::new(Day02 { input: all_input() }),
+        // "3" | "03" => Box::new(Day03 { input: all_input() }),
+        // "4" | "04" => Box::new(Day04 { input: all_input() }),
+        // "5" | "05" => Box::new(Day05 { input: all_input() }),
+        // "6" | "06" => Box::new(Day06 { input: all_input() }),
+        // "7" | "07" => Box::new(Day07 { input: all_input() }),
+        // "8" | "08" => Box::new(Day08 { input: all_input() }),
+        // "9" | "09" => Box::new(Day09 { input: all_input() }),
+        // "10" => Box::new(Day10 { input: all_input() }),
+        // "11" => Box::new(Day11 { input: all_input() }),
+        // "12" => Box::new(Day12 { input: all_input() }),
+        // "13" => Box::new(Day13 { input: all_input() }),
+        // "14" => Box::new(Day14 { input: all_input() }),
+        // "15" => Box::new(Day15 { input: all_input() }),
+        // "16" => Box::new(Day16 { input: all_input() }),
+        // "17" => Box::new(Day17 { input: all_input() }),
+        // "18" => Box::new(Day18 { input: all_input() }),
+        // "19" => Box::new(Day19 { input: all_input() }),
+        // "20" => Box::new(Day20 { input: all_input() }),
+        // "21" => Box::new(Day21 { input: all_input() }),
+        // "22" => Box::new(Day22 { input: all_input() }),
+        // "23" => Box::new(Day23 { input: all_input() }),
+        // "24" => Box::new(Day24 { input: all_input() }),
+        // "25" => Box::new(Day25 { input: all_input() }),
         _ => panic!("Unkown day!"),
     };
 
