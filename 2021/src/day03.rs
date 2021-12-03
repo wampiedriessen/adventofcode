@@ -20,11 +20,10 @@ impl Day03 {
                         countbits += 1;
                     }
                 }
-    
-                let wlen = &work_list.len();
+
                 // if true, '1' is most common
-                let keepchar = if countbits*2 >= *wlen { most_common } else { least_common };
-    
+                let keepchar = if countbits*2 >= work_list.len() { most_common } else { least_common };
+
                 work_list.retain(|x| x.as_bytes()[i as usize] == keepchar as u8);
 
                 if work_list.len() == 1 {
@@ -32,7 +31,6 @@ impl Day03 {
                 }
             }
         }
-
     }
 }
 
@@ -40,10 +38,10 @@ impl Day for Day03 {
     fn part1(&self) -> String {
         let bytes: Vec<u32> = self.input.iter().map(|x| u32::from_str_radix(x, 2).unwrap()).collect();
         let bitlen = self.input[0].len() as u32;
-        
+
         let mut gamma = 0;
         let mut epsilon = 0;
-        
+
         for index in 0..bitlen {
             let bit = 2u32.pow(index);
             let mut countbits = 0;
@@ -52,17 +50,17 @@ impl Day for Day03 {
                     countbits += 1;
                 }
             }
-            
+
             if countbits*2 > bytes.len() {
                 epsilon += bit;
             } else {
                 gamma += bit;
             }
         }
-        
+
         (gamma * epsilon).to_string()
     }
-    
+
     fn part2(&self) -> String {
         let oxy = self.bit_criteria_loop('1', '0');
         let co2 = self.bit_criteria_loop('0', '1');
