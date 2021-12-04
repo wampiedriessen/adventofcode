@@ -7,12 +7,12 @@ pub struct Day04 {
 }
 
 #[derive(Debug)]
-struct Board<'a> {
-    grid: [[&'a str; 5]; 5],
+struct Board {
+    grid: [[i64; 5]; 5],
 }
 
-impl<'a> Board<'a> {
-    fn has_won(&self, draws: &HashSet<&str>) -> bool {
+impl Board {
+    fn has_won(&self, draws: &HashSet<i64>) -> bool {
         for i in 0..5 {
             let mut xc = 0;
             let mut yc = 0;
@@ -31,12 +31,13 @@ impl<'a> Board<'a> {
         false
     }
 
-    fn get_sum_left(&self, draws: HashSet<&str>) -> i64 {
+    fn get_sum_left(&self, draws: HashSet<i64>) -> i64 {
         let mut sum = 0;
+
         for l in self.grid {
             for n in l {
-                if !draws.contains(n) {
-                    sum += n.parse::<i64>().unwrap();
+                if !draws.contains(&n) {
+                    sum += n
                 }
             }
         }
@@ -45,19 +46,25 @@ impl<'a> Board<'a> {
 }
 
 impl Day04 {
-    fn read_board<'a>(&self, board: &'a [String]) -> Board<'a> {
-        let mut grid: [[&'a str; 5]; 5] = [[""; 5]; 5];
+    fn read_board(&self, board: &[String]) -> Board {
+        let mut grid: [[i64; 5]; 5] = [[-1; 5]; 5];
 
         for y in 0..5 {
-            let line: Vec<&str> = board[y].split_whitespace().collect();
+            let line: Vec<i64> = board[y]
+                .split_whitespace()
+                .map(|c| c.parse().unwrap())
+                .collect();
             for x in 0..5 {
                 grid[y][x] = line[x];
             }
         }
         Board { grid }
     }
-    fn read_boards(&self) -> (Vec<&str>, Vec<Board>) {
-        let mut draws: Vec<&str> = self.input[0].split(',').collect();
+    fn read_boards(&self) -> (Vec<i64>, Vec<Board>) {
+        let mut draws: Vec<i64> = self.input[0]
+            .split(',')
+            .map(|c| c.parse().unwrap())
+            .collect();
         draws.reverse(); // make it into a queue
 
         let mut boards = Vec::new();
@@ -77,7 +84,7 @@ impl Day for Day04 {
 
         let mut drawn = HashSet::new();
         let mut ended = false;
-        let mut lastdraw = "";
+        let mut lastdraw = -1;
         let mut winner = &boards[0];
         while !drawqueue.is_empty() && !ended {
             lastdraw = drawqueue.pop().unwrap();
@@ -94,14 +101,14 @@ impl Day for Day04 {
 
         let winnersum = winner.get_sum_left(drawn);
 
-        (winnersum * lastdraw.parse::<i64>().unwrap()).to_string()
+        (winnersum * lastdraw).to_string()
     }
 
     fn part2(&self) -> String {
         let (mut drawqueue, mut boards) = self.read_boards();
 
         let mut drawn = HashSet::new();
-        let mut lastdraw = "";
+        let mut lastdraw = -1;
         while boards.len() > 1 {
             lastdraw = drawqueue.pop().unwrap();
 
@@ -121,7 +128,7 @@ impl Day for Day04 {
 
         let losersum = loser.get_sum_left(drawn);
 
-        (losersum * lastdraw.parse::<i64>().unwrap()).to_string()
+        (losersum * lastdraw).to_string()
     }
 }
 
