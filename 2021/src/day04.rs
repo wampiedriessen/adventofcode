@@ -60,6 +60,7 @@ impl Day04 {
         }
         Board { grid }
     }
+
     fn read_boards(&self) -> (Vec<i64>, Vec<Board>) {
         let mut draws: Vec<i64> = self.input[0]
             .split(',')
@@ -67,12 +68,10 @@ impl Day04 {
             .collect();
         draws.reverse(); // make it into a queue
 
-        let mut boards = Vec::new();
-
-        for board in self.input[1..].chunks(6) {
-            // first line of board is whitespace line (see input)
-            boards.push(self.read_board(&board[1..]));
-        }
+        let boards = self.input[1..]
+            .chunks(6)
+            .map(|board| self.read_board(&board[1..]))
+            .collect();
 
         (draws, boards)
     }
