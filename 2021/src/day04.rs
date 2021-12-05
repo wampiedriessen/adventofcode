@@ -192,6 +192,6 @@ mod test {
     fn part2() {
         let d = get_day(0);
 
-        assert_eq!("2555739", d.part2());
+        assert_eq!("4590", d.part2());
     }
 }
