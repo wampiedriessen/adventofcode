@@ -42,13 +42,13 @@ impl Line {
         return self.x1 == self.x2 || self.y1 == self.y2;
     }
 
-    pub fn get_coords(&self) -> Vec<Coord> {
-        let mut coords = Vec::new();
-
+    pub fn add_coords(&self, coords: &mut HashSet<Coord>, double_coords: &mut HashSet<Coord>) {
         let mut x = self.x1;
         let mut y = self.y1;
 
-        coords.push(Coord { x, y });
+        if !coords.insert(Coord { x, y }) {
+            let _ = double_coords.insert(Coord { x, y });
+        }
         while x != self.x2 || y != self.y2 {
             if x != self.x2 {
                 if x > self.x2 {
@@ -65,10 +65,10 @@ impl Line {
                 }
             }
 
-            coords.push(Coord { x, y });
+            if !coords.insert(Coord { x, y }) {
+                let _ = double_coords.insert(Coord { x, y });
+            }
         }
-
-        coords
     }
 }
 
@@ -78,12 +78,7 @@ impl Day05 {
         let mut double_coords = HashSet::new();
 
         for line in lines {
-            for coord in line.get_coords() {
-                let inserted = coords.insert(coord.clone());
-                if !inserted {
-                    let _ = &double_coords.insert(coord.clone());
-                }
-            }
+            line.add_coords(&mut coords, &mut double_coords);
         }
 
         double_coords.len().to_string()
