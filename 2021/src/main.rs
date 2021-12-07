@@ -4,7 +4,7 @@ mod day03;
 mod day04;
 mod day05;
 mod day06;
-// mod day07;
+mod day07;
 // mod day08;
 // mod day09;
 // mod day10;
@@ -30,7 +30,7 @@ use crate::day03::Day03;
 use crate::day04::Day04;
 use crate::day05::Day05;
 use crate::day06::Day06;
-// use crate::day07::Day07;
+use crate::day07::Day07;
 // use crate::day08::Day08;
 // use crate::day09::Day09;
 // use crate::day10::Day10;
@@ -68,7 +68,7 @@ fn main() {
         "4" | "04" => Box::new(Day04 { input: all_input() }),
         "5" | "05" => Box::new(Day05 { input: all_input() }),
         "6" | "06" => Box::new(Day06 { input: all_input() }),
-        // "7" | "07" => Box::new(Day07 { input: all_input() }),
+        "7" | "07" => Box::new(Day07 { input: all_input() }),
         // "8" | "08" => Box::new(Day08 { input: all_input() }),
         // "9" | "09" => Box::new(Day09 { input: all_input() }),
         // "10" => Box::new(Day10 { input: all_input() }),
