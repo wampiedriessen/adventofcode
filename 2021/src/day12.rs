@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::Day;
 
@@ -10,22 +10,29 @@ type Map = HashMap<String, Vec<String>>;
 
 #[derive(Clone, Debug)]
 struct Path {
-    been: Vec<String>,
-    pub double_seen: bool,
+    last: String,
+    been: HashSet<String>,
+    double_seen: bool,
 }
 
 impl Path {
     fn start() -> Path {
         Path {
+            last: "start".to_string(),
+            been: HashSet::from_iter(vec!["start".to_string()]),
             double_seen: false,
-            been: vec!["start".to_string()],
         }
+    }
+
+    fn has_double(&self) -> bool {
+        self.double_seen
     }
 
     fn cave_added(&self, cave: &String) -> Path {
         let mut new_path = self.clone();
 
-        new_path.been.push(cave.clone());
+        new_path.last = cave.clone();
+        new_path.been.insert(cave.clone());
 
         if !is_upper(cave) && self.been.contains(cave) {
             new_path.double_seen = true;
@@ -35,7 +42,7 @@ impl Path {
     }
 
     fn last(&self) -> &String {
-        &self.been[self.been.len() - 1]
+        &self.last
     }
 
     fn is_new(&self, cave: &String) -> bool {
@@ -87,7 +94,7 @@ impl Day12 {
         map
     }
 
-    fn bfs_caves(&self, allowed_double: bool) -> usize {
+    fn dfs_caves(&self, allowed_double: bool) -> usize {
         let map = self.create_map();
 
         let mut todo: Vec<Path> = vec![Path::start()];
@@ -108,7 +115,7 @@ impl Day12 {
 
                 if is_upper(&cave)
                     || cur_path.is_new(&cave)
-                    || (allowed_double && !cur_path.double_seen)
+                    || (allowed_double && !cur_path.has_double())
                 {
                     todo.push(cur_path.cave_added(cave));
                 }
@@ -121,10 +128,10 @@ impl Day12 {
 
 impl Day for Day12 {
     fn part1(&self) -> String {
-        self.bfs_caves(false).to_string()
+        self.dfs_caves(false).to_string()
     }
     fn part2(&self) -> String {
-        self.bfs_caves(true).to_string()
+        self.dfs_caves(true).to_string()
     }
 }
 
