@@ -1,4 +1,5 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
+use std::rc::Rc;
 
 use crate::Day;
 
@@ -8,45 +9,47 @@ pub struct Day12 {
 
 type Map = HashMap<String, Vec<String>>;
 
-#[derive(Clone, Debug)]
-struct Path {
-    last: String,
-    been: HashSet<String>,
-    double_seen: bool,
+enum Node<'a> {
+    Cave((bool, &'a String), Rc<Node<'a>>),
+    End(Rc<Node<'a>>),
+    Start,
 }
 
-impl Path {
-    fn start() -> Path {
-        Path {
-            last: "start".to_string(),
-            been: HashSet::from_iter(vec!["start".to_string()]),
-            double_seen: false,
+const START: &str = "start";
+const END: &str = "end";
+
+impl Node<'_> {
+    fn get_name(&self) -> &str {
+        match self {
+            Node::Cave((_, x), _) => x,
+            Node::Start => START,
+            Node::End(_) => END,
+        }
+    }
+
+    fn is_new(&self, cave: &String) -> bool {
+        let mut node = self;
+
+        loop {
+            match node {
+                Node::Start => return true,
+                Node::Cave((_, x), next) => {
+                    if x == &cave {
+                        return false;
+                    }
+                    node = next;
+                }
+                Node::End(_) => panic!("cannot end here"),
+            }
         }
     }
 
     fn has_double(&self) -> bool {
-        self.double_seen
-    }
-
-    fn cave_added(&self, cave: &String) -> Path {
-        let mut new_path = self.clone();
-
-        new_path.last = cave.clone();
-        new_path.been.insert(cave.clone());
-
-        if !is_upper(cave) && self.been.contains(cave) {
-            new_path.double_seen = true;
+        match self {
+            Node::Start => false,
+            Node::End(x) => x.has_double(),
+            Node::Cave((x, _), _) => *x,
         }
-
-        new_path
-    }
-
-    fn last(&self) -> &String {
-        &self.last
-    }
-
-    fn is_new(&self, cave: &String) -> bool {
-        !self.been.contains(cave)
     }
 }
 
@@ -94,30 +97,34 @@ impl Day12 {
         map
     }
 
-    fn dfs_caves(&self, allowed_double: bool) -> usize {
+    fn dfs_rc_caves(&self, allowed_double: bool) -> usize {
         let map = self.create_map();
 
-        let mut todo: Vec<Path> = vec![Path::start()];
-        let mut paths: Vec<Path> = vec![];
+        let mut todo: Vec<Node> = vec![Node::Start];
+        let mut paths: Vec<Node> = vec![];
 
         while !todo.is_empty() {
-            let cur_path = todo.pop().unwrap();
-            let possibilities = map.get(cur_path.last()).unwrap();
+            let cur_node = Rc::new(todo.pop().unwrap());
+            let possibilities = map.get(&cur_node.get_name().to_string()).unwrap();
 
             for cave in possibilities {
-                if cave == "start" {
-                    continue;
-                }
-                if cave == "end" {
-                    paths.push(cur_path.cave_added(cave));
+                if cave == &START {
                     continue;
                 }
 
-                if is_upper(&cave)
-                    || cur_path.is_new(&cave)
-                    || (allowed_double && !cur_path.has_double())
-                {
-                    todo.push(cur_path.cave_added(cave));
+                if cave == &END {
+                    paths.push(Node::End(Rc::clone(&cur_node)));
+                    continue;
+                }
+
+                if is_upper(&cave) || cur_node.is_new(&cave) {
+                    let nodeval = (cur_node.has_double(), cave);
+                    todo.push(Node::Cave(nodeval, Rc::clone(&cur_node)));
+                    continue;
+                }
+
+                if allowed_double && !cur_node.has_double() {
+                    todo.push(Node::Cave((true, cave), Rc::clone(&cur_node)));
                 }
             }
         }
@@ -128,10 +135,10 @@ impl Day12 {
 
 impl Day for Day12 {
     fn part1(&self) -> String {
-        self.dfs_caves(false).to_string()
+        self.dfs_rc_caves(false).to_string()
     }
     fn part2(&self) -> String {
-        self.dfs_caves(true).to_string()
+        self.dfs_rc_caves(true).to_string()
     }
 }
 
