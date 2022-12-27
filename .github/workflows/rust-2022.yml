@@ -1,0 +1,17 @@
+name: Rust 2022
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build
+        run: cargo build --verbose
+        working-directory: ./2022
+      - name: Run tests
+        run: cargo test --verbose
+        working-directory: ./2022
