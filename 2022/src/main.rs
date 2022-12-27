@@ -1,11 +1,13 @@
 mod day01;
 mod day02;
 mod day03;
+mod day04;
 
 use std::io::BufRead;
 use crate::day01::Day01;
 use crate::day02::Day02;
 use crate::day03::Day03;
+use crate::day04::Day04;
 
 pub trait Day {
     fn part1(&self) -> String;
@@ -20,7 +22,7 @@ fn main() {
         "1" | "01" => Box::new(Day01 { input: all_input() }),
         "2" | "02" => Box::new(Day02 { input: all_input() }),
         "3" | "03" => Box::new(Day03 { input: all_input() }),
-        // "4" | "04" => Box::new(Day04 { input: all_input() }),
+        "4" | "04" => Box::new(Day04 { input: all_input() }),
         // "5" | "05" => Box::new(Day05 { input: all_input() }),
         // "6" | "06" => Box::new(Day06 { input: all_input() }),
         // "7" | "07" => Box::new(Day07 { input: all_input() }),
