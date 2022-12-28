@@ -222,6 +222,6 @@ move 1 from 1 to 2";
     fn part2() {
         let d = get_day(0);
 
-        assert_eq!("823", d.part2());
+        assert_eq!("DMRDFRHHH", d.part2());
     }
 }
