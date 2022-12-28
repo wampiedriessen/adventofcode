@@ -33,12 +33,12 @@ impl FromStr for SectionAssignment {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let sa: Vec<&str> = s.split(',').collect();
 
-        let l: Vec<&str> = sa.get(0).unwrap().split('-').collect();
+        let l: Vec<&str> = sa.first().unwrap().split('-').collect();
         let r: Vec<&str> = sa.get(1).unwrap().split('-').collect();
 
         Ok(SectionAssignment {
-            section1: (l.get(0).unwrap().parse().unwrap(), l.get(1).unwrap().parse().unwrap()),
-            section2: (r.get(0).unwrap().parse().unwrap(), r.get(1).unwrap().parse().unwrap())
+            section1: (l.first().unwrap().parse().unwrap(), l.get(1).unwrap().parse().unwrap()),
+            section2: (r.first().unwrap().parse().unwrap(), r.get(1).unwrap().parse().unwrap())
         })
     }
 }

@@ -26,7 +26,7 @@ impl FromStr for Instruction {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        assert_eq!(true, s.starts_with("move "));
+        assert!(s.starts_with("move "));
         let splits: Vec<&str> = s.split_whitespace().collect();
 
         Ok(Instruction{
@@ -83,8 +83,7 @@ impl CrateStacks {
             }
             let chunks = line.as_bytes().chunks(4);
 
-            let mut i = 0;
-            for chunk in chunks {
+            for (i, chunk) in chunks.enumerate() {
                 if stacks.len() >= i {
                     stacks.push(VecDeque::new());
                 }
@@ -92,8 +91,6 @@ impl CrateStacks {
                 if let Ok(newcrate) = String::from_utf8_lossy(chunk).parse() {
                     stacks[i].push_back(newcrate);
                 }
-
-                i += 1;
             }
         }
 

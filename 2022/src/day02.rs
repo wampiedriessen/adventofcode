@@ -80,24 +80,20 @@ impl FromStr for Tactic {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let request = match s.chars().nth(0).unwrap() {
+        let mut chars = s.chars();
+        let request = match chars.next().unwrap() {
             'A' => Rock,
             'B' => Paper,
             'C' => Scissors,
             _ => panic!()
         };
+        // skip space
+        chars.next();
 
-        let response = match s.chars().nth(2).unwrap() {
-            'X' => Rock,
-            'Y' => Paper,
-            'Z' => Scissors,
-            _ => panic!()
-        };
-
-        let endgame = match s.chars().nth(2).unwrap() {
-            'X' => Lose,
-            'Y' => Draw,
-            'Z' => Win,
+        let (response, endgame) = match chars.next().unwrap() {
+            'X' => (Rock, Lose),
+            'Y' => (Paper, Draw),
+            'Z' => (Scissors, Win),
             _ => panic!()
         };
 

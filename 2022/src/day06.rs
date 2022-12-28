@@ -12,10 +12,10 @@ fn detect_marker(window: &[char], num: usize) -> bool {
             }
         }
     }
-    return true;
+    true
 }
 
-fn get_marker_pos(signal: &String, num: usize) -> String {
+fn get_marker_pos(signal: &str, num: usize) -> String {
     let characters: Vec<char> = signal.chars().collect();
     let markersearch = characters.windows(num);
 

@@ -16,13 +16,13 @@ impl Rucksack {
     fn non_segregated_item(&self) -> &char {
         self.compartment1
             .intersection(&self.compartment2)
-            .nth(0).unwrap()
+            .next().unwrap()
     }
 
-    fn badge_item_type(&self, other1: &Rucksack, other2: &Rucksack) -> char {
-        *self.rs.intersection(&other1.rs).collect::<HashSet<&char>>()
+    fn badge_item_type<'a>(&'a self, other1: &'a Rucksack, other2: &'a Rucksack) -> &'a char {
+        self.rs.intersection(&other1.rs).collect::<HashSet<&char>>()
             .intersection(&other2.rs.iter().collect())
-            .nth(0).unwrap().clone()
+            .next().unwrap()
     }
 }
 
@@ -35,16 +35,14 @@ impl FromStr for Rucksack {
         let mut rs = HashSet::new();
 
         let m = s.len();
-        let mut i = 0;
 
-        for item in s.chars() {
+        for (i, item) in s.chars().enumerate() {
             if i < m/2 {
                 c1.insert(item);
             } else {
                 c2.insert(item);
             }
             rs.insert(item);
-            i += 1;
         }
 
         Ok(Rucksack {
@@ -57,9 +55,9 @@ impl FromStr for Rucksack {
 
 fn priority(x: &char) -> u32 {
     (if x.is_ascii_lowercase() {
-        (*x as u8) - ('a' as u8) + 1
+        (*x as u8) - b'a' + 1
     } else {
-        (*x as u8) - ('A' as u8) + 27
+        (*x as u8) - b'A' + 27
     }).into()
 }
 
@@ -87,7 +85,7 @@ impl Day for Day03 {
 
             let badge = rs0.badge_item_type(&rs1, &rs2);
 
-            sum += priority(&badge);
+            sum += priority(badge);
         }
 
         sum.to_string()

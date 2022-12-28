@@ -53,7 +53,7 @@ fn parse_shell(input: &Vec<String>) -> FileSystem {
 
                 dir.insert_entry(cwd.clone());
                 entitypool.insert(cwd.clone(), Entry::Dir(Directory::new()));
-            } else if !command.starts_with("$") {
+            } else if !command.starts_with('$') {
                 let spl: Vec<&str> = command.split_whitespace().collect();
                 let filesize = spl[0];
 
@@ -62,7 +62,7 @@ fn parse_shell(input: &Vec<String>) -> FileSystem {
                     continue;
                 }
 
-                let filename: String = cwd.clone() + &spl[1].to_string();
+                let filename: String = cwd.clone() + spl[1];
 
                 dir.insert_entry(filename.clone());
 
@@ -77,7 +77,7 @@ fn parse_shell(input: &Vec<String>) -> FileSystem {
     entitypool
 }
 
-fn get_size(fs: &FileSystem, dir: &String) -> usize {
+fn get_size(fs: &FileSystem, dir: &str) -> usize {
     match fs.get(dir) {
         None => panic!("dead reference!"),
         Some(Entry::File(s)) => *s,
@@ -85,17 +85,17 @@ fn get_size(fs: &FileSystem, dir: &String) -> usize {
     }
 }
 
-fn visit_dirs<T>(fs: &FileSystem, dir: &String, mut f: T) where T: FnMut(&String) {
-    let mut stack = vec![dir.clone()];
+fn visit_dirs<T>(fs: &FileSystem, dir: &str, mut f: T) where T: FnMut(&str) {
+    let mut stack = vec![dir];
 
     while !stack.is_empty() {
         let node = stack.pop().unwrap();
-        if let Some(Entry::Dir(dir)) = fs.get(&node) {
+        if let Some(Entry::Dir(dir)) = fs.get(node) {
 
-            f(&node);
+            f(node);
 
             for entry in &dir.entries {
-                stack.push(entry.clone());
+                stack.push(entry);
             }
         }
     }
@@ -106,7 +106,7 @@ impl Day for Day07 {
         let filesystem = parse_shell(&self.input);
         let mut sumsizes = 0;
 
-        visit_dirs(&filesystem, &"/".to_string(), |dirname| {
+        visit_dirs(&filesystem, "/", |dirname| {
             let nodesize = get_size(&filesystem, dirname);
 
             if nodesize <= 100000 {
@@ -122,11 +122,11 @@ impl Day for Day07 {
         const MIN: usize = 30000000;
 
         let filesystem = parse_shell(&self.input);
-        let cursize = get_size(&filesystem, &"/".to_string());
+        let cursize = get_size(&filesystem, "/");
         let desired_win = MIN - (MAX - cursize);
 
         let mut bestsize = MIN;
-        visit_dirs(&filesystem, &"/".to_string(), |dirname| {
+        visit_dirs(&filesystem, "/", |dirname| {
             let nodesize = get_size(&filesystem, dirname);
 
             if nodesize < bestsize && nodesize > desired_win {
