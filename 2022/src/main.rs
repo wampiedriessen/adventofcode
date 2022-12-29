@@ -9,7 +9,9 @@ mod day08;
 mod day09;
 mod day10;
 mod day11;
+mod day12;
 
+use std::io::{BufRead, Read};
 use crate::day01::Day01;
 use crate::day02::Day02;
 use crate::day03::Day03;
@@ -21,7 +23,7 @@ use crate::day08::Day08;
 use crate::day09::Day09;
 use crate::day10::Day10;
 use crate::day11::Day11;
-use std::io::{BufRead, Read};
+use crate::day12::Day12;
 
 pub trait Day {
     fn part1(&self) -> String;
@@ -44,20 +46,20 @@ fn main() {
         "9" | "09" => Box::new(Day09 { input: all_lines() }),
         "10" => Box::new(Day10 { input: all_lines() }),
         "11" => Box::new(Day11 { input: full_input() }),
-        // "12" => Box::new(Day12 { input: all_input() }),
-        // "13" => Box::new(Day13 { input: all_input() }),
-        // "14" => Box::new(Day14 { input: all_input() }),
-        // "15" => Box::new(Day15 { input: all_input() }),
-        // "16" => Box::new(Day16 { input: all_input() }),
-        // "17" => Box::new(Day17 { input: all_input() }),
-        // "18" => Box::new(Day18 { input: all_input() }),
-        // "19" => Box::new(Day19 { input: all_input() }),
-        // "20" => Box::new(Day20 { input: all_input() }),
-        // "21" => Box::new(Day21 { input: all_input() }),
-        // "22" => Box::new(Day22 { input: all_input() }),
-        // "23" => Box::new(Day23 { input: all_input() }),
-        // "24" => Box::new(Day24 { input: all_input() }),
-        // "25" => Box::new(Day25 { input: all_input() }),
+        "12" => Box::new(Day12 { input: all_lines() }),
+        // "13" => Box::new(Day13 { input: all_lines() }),
+        // "14" => Box::new(Day14 { input: all_lines() }),
+        // "15" => Box::new(Day15 { input: all_lines() }),
+        // "16" => Box::new(Day16 { input: all_lines() }),
+        // "17" => Box::new(Day17 { input: all_lines() }),
+        // "18" => Box::new(Day18 { input: all_lines() }),
+        // "19" => Box::new(Day19 { input: all_lines() }),
+        // "20" => Box::new(Day20 { input: all_lines() }),
+        // "21" => Box::new(Day21 { input: all_lines() }),
+        // "22" => Box::new(Day22 { input: all_lines() }),
+        // "23" => Box::new(Day23 { input: all_lines() }),
+        // "24" => Box::new(Day24 { input: all_lines() }),
+        // "25" => Box::new(Day25 { input: all_lines() }),
         _ => panic!("Unkown day!"),
     };
 

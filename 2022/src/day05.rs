@@ -1,5 +1,4 @@
 use std::collections::VecDeque;
-use std::fmt::{Debug, Formatter};
 use std::str::FromStr;
 use crate::Day;
 
@@ -48,23 +47,6 @@ impl FromStr for Crate {
         Ok(Crate {
             letter: s.chars().nth(1).unwrap()
         })
-    }
-}
-
-impl Debug for Crate {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Crate")
-            .field("letter", &self.letter)
-            .finish()
-    }
-}
-
-impl Debug for CrateStacks {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("CrateStacks")
-            .field("stacks", &self.stacks)
-            .field("instructions", &self.instructions)
-            .finish()
     }
 }
 
