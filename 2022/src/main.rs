@@ -8,6 +8,7 @@ mod day07;
 mod day08;
 mod day09;
 mod day10;
+mod day11;
 
 use crate::day01::Day01;
 use crate::day02::Day02;
@@ -19,7 +20,8 @@ use crate::day07::Day07;
 use crate::day08::Day08;
 use crate::day09::Day09;
 use crate::day10::Day10;
-use std::io::BufRead;
+use crate::day11::Day11;
+use std::io::{BufRead, Read};
 
 pub trait Day {
     fn part1(&self) -> String;
@@ -31,17 +33,17 @@ fn main() {
 
     // Prints each argument on a separate line
     let day: Box<dyn Day> = match args[1].as_str() {
-        "1" | "01" => Box::new(Day01 { input: all_input() }),
-        "2" | "02" => Box::new(Day02 { input: all_input() }),
-        "3" | "03" => Box::new(Day03 { input: all_input() }),
-        "4" | "04" => Box::new(Day04 { input: all_input() }),
-        "5" | "05" => Box::new(Day05 { input: all_input() }),
-        "6" | "06" => Box::new(Day06 { input: all_input() }),
-        "7" | "07" => Box::new(Day07 { input: all_input() }),
-        "8" | "08" => Box::new(Day08 { input: all_input() }),
-        "9" | "09" => Box::new(Day09 { input: all_input() }),
-        "10" => Box::new(Day10 { input: all_input() }),
-        // "11" => Box::new(Day11 { input: all_input() }),
+        "1" | "01" => Box::new(Day01 { input: all_lines() }),
+        "2" | "02" => Box::new(Day02 { input: all_lines() }),
+        "3" | "03" => Box::new(Day03 { input: all_lines() }),
+        "4" | "04" => Box::new(Day04 { input: all_lines() }),
+        "5" | "05" => Box::new(Day05 { input: all_lines() }),
+        "6" | "06" => Box::new(Day06 { input: all_lines() }),
+        "7" | "07" => Box::new(Day07 { input: all_lines() }),
+        "8" | "08" => Box::new(Day08 { input: all_lines() }),
+        "9" | "09" => Box::new(Day09 { input: all_lines() }),
+        "10" => Box::new(Day10 { input: all_lines() }),
+        "11" => Box::new(Day11 { input: full_input() }),
         // "12" => Box::new(Day12 { input: all_input() }),
         // "13" => Box::new(Day13 { input: all_input() }),
         // "14" => Box::new(Day14 { input: all_input() }),
@@ -65,7 +67,7 @@ fn main() {
     println!("{}", day.part2());
 }
 
-fn all_input() -> Vec<String> {
+fn all_lines() -> Vec<String> {
     let mut input = Vec::new();
 
     let stdin = std::io::stdin();
@@ -74,4 +76,10 @@ fn all_input() -> Vec<String> {
     }
 
     input
+}
+
+fn full_input() -> String {
+    let mut input = Vec::new();
+    std::io::stdin().read_to_end(&mut input).unwrap();
+    String::from_utf8(input).unwrap()
 }
