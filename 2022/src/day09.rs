@@ -1,6 +1,6 @@
+use crate::Day;
 use std::collections::HashSet;
 use std::str::FromStr;
-use crate::Day;
 
 pub struct Day09 {
     pub input: Vec<String>,
@@ -19,7 +19,7 @@ enum Direction {
 
 struct Instruction {
     direction: Direction,
-    steps: usize
+    steps: usize,
 }
 
 impl FromStr for Direction {
@@ -31,7 +31,7 @@ impl FromStr for Direction {
             "D" => Direction::Down,
             "R" => Direction::Right,
             "L" => Direction::Left,
-            _ => panic!("Cannot give this direction")
+            _ => panic!("Cannot give this direction"),
         })
     }
 }
@@ -42,23 +42,23 @@ impl FromStr for Instruction {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let spl: Vec<&str> = s.split_whitespace().collect();
 
-        Ok(Instruction{
+        Ok(Instruction {
             direction: spl[0].parse().unwrap(),
-            steps: spl[1].parse().unwrap()
+            steps: spl[1].parse().unwrap(),
         })
     }
 }
 
 struct Rope {
     knots: Vec<(i32, i32)>,
-    numknots: usize
+    numknots: usize,
 }
 
 impl Rope {
     fn new(knots: usize) -> Rope {
         Rope {
             knots: vec![(0, 0); knots],
-            numknots: knots
+            numknots: knots,
         }
     }
 
@@ -77,22 +77,38 @@ impl Rope {
                 Direction::Left => head.0 -= 1,
                 Direction::Right => head.0 += 1,
 
-                Direction::LeftUp => {head.0 -= 1; head.1 += 1},
-                Direction::RightUp => {head.0 += 1; head.1 += 1},
-                Direction::LeftDown => {head.0 -= 1; head.1 -= 1},
-                Direction::RightDown => {head.0 += 1; head.1 -= 1},
+                Direction::LeftUp => {
+                    head.0 -= 1;
+                    head.1 += 1
+                }
+                Direction::RightUp => {
+                    head.0 += 1;
+                    head.1 += 1
+                }
+                Direction::LeftDown => {
+                    head.0 -= 1;
+                    head.1 -= 1
+                }
+                Direction::RightDown => {
+                    head.0 += 1;
+                    head.1 -= 1
+                }
             };
             headx = head.0;
             heady = head.1;
         }
 
         // last knot
-        if knotnum + 1 == self.numknots { return; }
+        if knotnum + 1 == self.numknots {
+            return;
+        }
 
-        let tail = self.knots[knotnum+1];
+        let tail = self.knots[knotnum + 1];
 
         // no movement for next knot
-        if (headx - tail.0).abs() <= 1 && (heady - tail.1).abs() <= 1 { return; }
+        if (headx - tail.0).abs() <= 1 && (heady - tail.1).abs() <= 1 {
+            return;
+        }
 
         let newdir = match (headx - tail.0, heady - tail.1) {
             (-2, x) if x < 0 => Direction::LeftDown,
@@ -111,7 +127,7 @@ impl Rope {
             (0, 2) => Direction::Up,
             (x, 2) if x > 0 => Direction::RightUp,
 
-            _ => panic!("Should have moved already!")
+            _ => panic!("Should have moved already!"),
         };
 
         self.step(knotnum + 1, &newdir);
@@ -204,7 +220,6 @@ U 20";
         assert_eq!("36", d.part2());
     }
 
-
     #[test]
     fn part1() {
         let d = get_day(0);
@@ -216,6 +231,6 @@ U 20";
     fn part2() {
         let d = get_day(0);
 
-        assert_eq!("474606", d.part2());
+        assert_eq!("2467", d.part2());
     }
 }
