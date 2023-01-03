@@ -6,7 +6,7 @@ pub struct Day13 {
     pub input: Vec<String>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 enum Packet {
     List(Vec<Packet>),
     Int(i32)
@@ -40,6 +40,36 @@ impl FromStr for Packet {
     }
 }
 
+impl PartialOrd for Packet {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        match (self, other) {
+            (Packet::Int(l), Packet::Int(r)) if l != r => Some(l.cmp(r)),
+            (Packet::Int(_l), Packet::Int(_r)) => None,
+            (Packet::List(l), Packet::List(r)) => {
+                for i in 0..l.len() {
+                    if i >= r.len() { return Some(Ordering::Greater); }
+                    if let Some(x) = l[i].partial_cmp(&r[i]) {
+                        return Some(x);
+                    }
+                }
+                if r.len() > l.len() { Some(Ordering::Less) } else { None }
+            },
+            (Packet::List(_), Packet::Int(r)) => self.partial_cmp(&Packet::List(vec![Packet::Int(*r)])),
+            (Packet::Int(l), Packet::List(_)) => Packet::List(vec![Packet::Int(*l)]).partial_cmp( other),
+        }
+    }
+}
+
+impl Ord for Packet {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if let Some(x) = self.partial_cmp(other) {
+            x
+        } else {
+            Ordering::Equal
+        }
+    }
+}
+
 struct Pair {
     left: Packet,
     right: Packet,
@@ -69,33 +99,13 @@ fn parse_input2(lines: &[String]) -> Vec<Packet> {
     pairs
 }
 
-fn in_order(left: &Packet, right: &Packet) -> Option<bool> {
-    match (left, right) {
-        (Packet::Int(l), Packet::Int(r)) if l < r => Some(true),
-        (Packet::Int(l), Packet::Int(r)) if l > r => Some(false),
-        (Packet::Int(_), Packet::Int(_)) => None,
-        (Packet::List(l), Packet::List(r)) => {
-            for (i, it) in l.iter().enumerate() {
-                if i >= r.len() { return Some(false); }
-                match in_order(it, &r[i]) {
-                    None => { continue; }
-                    Some(x) => { return Some(x) }
-                }
-            }
-            if r.len() > l.len() { Some(true) } else { None }
-        },
-        (Packet::List(_), Packet::Int(_)) => in_order(left, &Packet::List(vec![right.clone()])),
-        (Packet::Int(_), Packet::List(_)) => in_order(&Packet::List(vec![left.clone()]), right),
-    }
-}
-
 impl Day for Day13 {
     fn part1(&self) -> String {
         let pairs = parse_input(&self.input);
 
         let mut sum = 0;
         for (i, pair) in pairs.iter().enumerate() {
-            if in_order(&pair.left, &pair.right).unwrap() { sum += i + 1; }
+            if pair.left <= pair.right { sum += i + 1; }
         }
 
         sum.to_string()
@@ -110,21 +120,15 @@ impl Day for Day13 {
         packets.push(pack2.clone());
         packets.push(pack6.clone());
 
-        packets.sort_by(|x, x1| {
-            match in_order(x, x1) {
-                Some(false) => Ordering::Greater,
-                Some(true) => Ordering::Less,
-                None => Ordering::Equal,
-            }
-        });
+        packets.sort();
 
         let mut ipack2 = 0;
         let mut ipack6 = 0;
         for (i, p) in packets.iter().enumerate() {
-            if in_order(p, &pack2).is_none() {
+            if p == &pack2 {
                 ipack2 = i + 1;
             }
-            if in_order(p, &pack6).is_none() {
+            if p == &pack6 {
                 ipack6 = i + 1;
             }
         }
