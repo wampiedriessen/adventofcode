@@ -36,7 +36,7 @@ impl FromStr for CoordList {
         let mut coords = Vec::with_capacity(coordstrings.len());
 
         for coord in coordstrings {
-            let spl: Vec<&str> = coord.split(",").collect();
+            let spl: Vec<&str> = coord.split(',').collect();
             coords.push(Coord {
                 x: spl[0].parse().unwrap(),
                 y: spl[1].parse().unwrap()
