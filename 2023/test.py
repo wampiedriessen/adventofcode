@@ -18,7 +18,7 @@ for daydir in dirs:
         for n in ["1","2"]:
             outfile = f'{inp.path[:-3]}.out{n}'
             if os.path.exists(outfile):
-                p = subprocess.run([f'{daydir.path}/start', n], input=inputValue, capture_output=True, text=True)
+                p = subprocess.run([f'./start', n], input=inputValue, capture_output=True, text=True, cwd=f'{daydir.path}')
                 expectedOutput = Path(outfile).read_text()
 
                 results[daydir.name][f'p{n} - {inp.name[:-3]}'] = {

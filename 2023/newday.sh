@@ -1,0 +1,11 @@
+mkdir "day$1"
+mkdir "day$1/files"
+touch "day$1/files/prod.in"
+touch "day$1/files/prod.out1"
+touch "day$1/files/prod.out2"
+touch "day$1/files/a.in"
+touch "day$1/files/a.out1"
+touch "day$1/files/a.out2"
+
+echo "#!/bin/sh\n\ncargo run -r -q -- \$@" > "day$1/start"
+chmod +x "day$1/start"
