@@ -1,3 +1,9 @@
 #dotnet
 obj/
 bin/
+
+#rust
+target/
+
+#kotlin
+*.jar
