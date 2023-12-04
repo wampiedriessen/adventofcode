@@ -1,0 +1,14 @@
+#!/bin/sh
+
+docker stop adventofcode-4 > /dev/null 2>&1
+docker run --name adventofcode-4 -d --rm -e POSTGRES_PASSWORD="Santa" postgres > /dev/null 2>&1
+sleep 2
+docker exec -i -u postgres adventofcode-4 psql < bootstrap.sql
+docker exec -i -u postgres adventofcode-4 psql -c "COPY input FROM STDIN;"
+docker exec -u postgres adventofcode-4 psql -c "SELECT * FROM input;"
+
+docker exec -i -u postgres adventofcode-4 psql < main.sql
+
+docker exec -u postgres adventofcode-4 psql -c "SELECT part, answer FROM solution where part='$@';"
+
+docker stop adventofcode-4 > /dev/null 2>&1
