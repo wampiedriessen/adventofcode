@@ -17,12 +17,12 @@ fn main() -> io::Result<()> {
 }
 
 fn growing_or_shrinking(list: &Vec<i32>) -> bool {
-    let not_growing = list.windows(2)
+    let growing = ! list.windows(2)
         .any(|w| w[0] >= w[1] || w[0].abs_diff(w[1]) > 3);
-    let not_shrinking = list.windows(2)
+    let shrinking = ! list.windows(2)
         .any(|w| w[0] <= w[1] || w[0].abs_diff(w[1]) > 3);
 
-    !(not_growing && not_shrinking)
+    growing || shrinking
 }
 
 fn part1(lists: &Vec<Vec<i32>>) {
