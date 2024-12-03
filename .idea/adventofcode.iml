@@ -10,6 +10,11 @@
       <excludeFolder url="file://$MODULE_DIR$/archive/2022/target" />
       <excludeFolder url="file://$MODULE_DIR$/2024/day02/target" />
       <excludeFolder url="file://$MODULE_DIR$/archive/2022/target" />
+      <sourceFolder url="file://$MODULE_DIR$/2024/day03/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/2022/target" />
+      <excludeFolder url="file://$MODULE_DIR$/2024/day01/target" />
+      <excludeFolder url="file://$MODULE_DIR$/2024/day02/target" />
+      <excludeFolder url="file://$MODULE_DIR$/2024/day03/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
