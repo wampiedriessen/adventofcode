@@ -10,6 +10,7 @@
       <sourceFolder url="file://$MODULE_DIR$/2024/day04/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/2024/day01/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/2024/day05/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/2024/day06/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/2024/day07/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/2024/day08/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/2024/target" />
@@ -22,6 +23,7 @@
       <excludeFolder url="file://$MODULE_DIR$/2024/day03/target" />
       <excludeFolder url="file://$MODULE_DIR$/2024/day04/target" />
       <excludeFolder url="file://$MODULE_DIR$/2024/day05/target" />
+      <excludeFolder url="file://$MODULE_DIR$/2024/day06/target" />
       <excludeFolder url="file://$MODULE_DIR$/2024/day07/target" />
       <excludeFolder url="file://$MODULE_DIR$/2024/day08/target" />
     </content>
