@@ -22,32 +22,40 @@ fn reorder_files_1(disk: &Vec<i64>) -> Vec<i64> {
 fn reorder_files_2(disk: &Vec<i64>, filelengths: &HashMap<i64, i64>) -> Vec<i64> {
     let mut disk = disk.clone();
 
-    let mut c2 = disk.len() as i64 - 1;
+    let mut c2 = disk.len() - 1;
 
+    let mut lastseens = [0usize; 10];
     while c2 > 0 {
-        if disk[c2 as usize] == -1 { c2 -= 1; continue; }
+        if disk[c2] == -1 { c2 -= 1; continue; }
 
-        let filenum = disk[c2 as usize];
+        let filenum = disk[c2];
 
-        let len = filelengths[&filenum];
+        let len = filelengths[&filenum] as usize;
+        if c2 <= len { break;}
         c2 -= len;
 
-        let mut gapfound = -1;
-        for (gapindex, win) in disk.windows(len as usize).enumerate() {
+        let lastseen = lastseens[len];
+        let mut gap = usize::MAX;
+        for (gapindex, win) in disk[lastseen..].windows(len).enumerate() {
             if win.iter().all(|x| *x == -1) {
-                gapfound = gapindex as i64;
+                gap = gapindex + lastseen;
                 break;
             }
         }
 
-        if gapfound == -1 || gapfound >= c2 { continue; }
+        if gap == usize::MAX { continue; }
+        for i in len..10 {
+            lastseens[i] = gap;
+        }
 
-        for i in gapfound..gapfound+len {
-            disk[i as usize] = filenum;
+        if gap >= c2 { continue;}
+
+        for i in gap..gap+len {
+            disk[i] = filenum;
         }
 
         for i in c2+1..c2+len+1 {
-            disk[i as usize] = -1;
+            disk[i] = -1;
         }
     }
 
