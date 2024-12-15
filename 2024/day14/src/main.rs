@@ -67,42 +67,49 @@ fn part1(bots: &Vec<Robot>) -> usize {
     qs[0] * qs[1] * qs[2] * qs[3]
 }
 
-fn print_bot(bots: &Vec<Robot>, s: i32) {
+fn print_bots_if_tree(bots: &Vec<Robot>) -> bool {
     let coords = bots.iter().map(|b| (b.x, b.y)).collect::<Vec<_>>();
-    let mut grid = String::new();
-
-    let mut seen15 = false;
+    let mut seenconsecutive_max = 0;
     for y in 0..BOUNDY {
-        let mut seen = 0;
+        let mut seenconsecutive = 0;
         for x in 0..BOUNDX {
             if coords.contains(&(x, y)) {
-                grid.push('#');
-                seen += 1;
+                seenconsecutive += 1;
+                seenconsecutive_max = seenconsecutive_max.max(seenconsecutive)
             } else {
-                grid.push('.');
+                seenconsecutive = 0;
             }
         }
-        if seen >= 15 {
-            seen15 = true;
+    }
+    if seenconsecutive_max >= 30 {
+        for y in 0..BOUNDY {
+            for x in 0..BOUNDX {
+                print!("{}", if coords.contains(&(x, y)) { "#" } else { "." });
+            }
+            println!();
         }
-        grid.push('\n');
+        return true;
     }
-
-    if seen15 {
-        println!("Second: {}", s);
-        println!("{}", grid);
-    }
+    false
 }
 
 fn part2(bots: &Vec<Robot>) -> usize {
     let mut bots = bots.clone();
 
-    for s in 0..10000 {
-        print_bot(&bots, s);
+    let mut s = 0;
+    loop {
+        if print_bots_if_tree(&bots) {
+            break;
+        };
         step(&mut bots);
+        s += 1;
+
+        if s % 1000 == 0 {
+            println!("{}", s);
+        }
     }
 
-    0
+    s
 }
 
 fn main() -> io::Result<()> {
