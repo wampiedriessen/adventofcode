@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{BinaryHeap, HashMap, HashSet};
 use std::io;
 use std::io::Read;
 
@@ -15,16 +15,35 @@ const END: char = 'E';
 type Pos = (usize, usize, i8);
 type Grid = Vec<Vec<char>>;
 
+#[derive(PartialEq, Eq, Debug)]
+struct State((usize, Pos));
+
+impl PartialOrd for State {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for State {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        other.0.cmp(&self.0)
+    }
+}
+
+
 fn walk(best_scores: &mut HashMap<Pos, usize>, grid: &Grid, startpos: Pos, routes: &mut HashMap<Pos, Vec<(usize, Pos)>>) {
-    let mut stack = vec![(0, startpos)];
+    let mut stack: BinaryHeap<State> = BinaryHeap::new();
+    stack.push(State((0, startpos)));
+    let mut best_end_score = usize::MAX;
 
-    while !stack.is_empty() {
-        let (curscore, pos) = stack.pop().unwrap();
+    while let Some(State((curscore, pos))) = stack.pop() {
 
+        if curscore > best_end_score { continue; }
         if best_scores.contains_key(&pos) && curscore >= best_scores[&pos] { continue; }
         best_scores.insert(pos, curscore);
 
         if grid[pos.0][pos.1] == END {
+            best_end_score = best_end_score.min(curscore);
             continue;
         }
 
@@ -43,7 +62,7 @@ fn walk(best_scores: &mut HashMap<Pos, usize>, grid: &Grid, startpos: Pos, route
 
             let e = routes.entry(newpos).or_insert_with(Vec::new);
             e.push((curscore, pos));
-            stack.push((curscore + point, newpos));
+            stack.push(State((curscore + point, newpos)));
         }
     }
 }
