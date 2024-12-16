@@ -15,7 +15,7 @@ const END: char = 'E';
 type Pos = (usize, usize, i8);
 type Grid = Vec<Vec<char>>;
 
-fn walk(best_scores: &mut HashMap<Pos, usize>, grid: &Grid, startpos: Pos) {
+fn walk(best_scores: &mut HashMap<Pos, usize>, grid: &Grid, startpos: Pos, routes: &mut HashMap<Pos, Vec<(usize, Pos)>>) {
     let mut stack = vec![(0, startpos)];
 
     while !stack.is_empty() {
@@ -41,6 +41,8 @@ fn walk(best_scores: &mut HashMap<Pos, usize>, grid: &Grid, startpos: Pos) {
         for newpos in next_poses {
             let point = if newpos.2 == pos.2 { 1 } else { 1000 };
 
+            let e = routes.entry(newpos).or_insert_with(Vec::new);
+            e.push((curscore, pos));
             stack.push((curscore + point, newpos));
         }
     }
@@ -99,45 +101,35 @@ fn main() -> io::Result<()> {
     }
 
     let mut best_scores = HashMap::new();
-    walk(&mut best_scores, &grid, startpos);
+    let mut routes = HashMap::new();
+    walk(&mut best_scores, &grid, startpos, &mut routes);
 
-    println!("Part 1: {}", best_score_at_yx(&best_scores, endpos));
+    let best_score = best_score_at_yx(&best_scores, endpos);
+    println!("Part 1: {}", best_score);
 
-    let best_path_tiles = calc_best_path_tiles(&best_scores, &grid, endpos[0]);
-    println!("{:?}", best_path_tiles);
-    println!("Part 2: {}", best_path_tiles.len());
+    let mut positions = HashSet::new();
+    let mut stack = Vec::new();
+    for pos in endpos {
+        if best_scores.contains_key(&pos) && best_scores[&pos] == best_score {
+            positions.insert((pos.0, pos.1, 0));
+            stack.push(pos);
+        }
+    }
+
+    let mut seen = HashSet::new();
+    while !stack.is_empty() {
+        let pos = stack.pop().unwrap();
+        if seen.contains(&pos) { continue; }
+        seen.insert(pos);
+
+        for (score, p) in &routes[&pos] {
+            if score < &best_scores[&pos] {
+                positions.insert((p.0, p.1, 0));
+                stack.push(*p);
+            }
+        }
+    }
+    println!("Part 2: {}", positions.len());
 
     Ok(())
-}
-
-fn calc_best_path_tiles(best_scores: &HashMap<Pos, usize>, grid: &Grid, curpos: Pos) -> HashSet<Pos> {
-    let curscore = best_score_at_yx(best_scores, get_all_dirs_at(curpos.0, curpos.1));
-
-    let mut tiles = HashSet::new();
-    tiles.insert((curpos.0, curpos.1, 0));
-    let mut newposs: Vec<Pos> = Vec::new();
-    for nextpos in [
-            forward_step(grid, (curpos.0, curpos.1, 0)),
-            forward_step(grid, (curpos.0, curpos.1, 1)),
-            forward_step(grid, (curpos.0, curpos.1, 2)),
-            forward_step(grid, (curpos.0, curpos.1, 3)),
-        ] {
-        if nextpos.is_none() { continue; }
-        let nextpos = nextpos.unwrap();
-        let actualpos = (nextpos.0, nextpos.1, (nextpos.2 + 2) % 4);
-        if !best_scores.contains_key(&actualpos) { continue; }
-        let score = best_scores[&actualpos];
-        if score < curscore {
-            newposs.push(actualpos);
-        }
-    }
-
-    for pos in &newposs {
-        tiles.insert((pos.0, pos.1, 0));
-        for result in calc_best_path_tiles(best_scores, grid, *pos) {
-            tiles.insert(result);
-        }
-    }
-
-    tiles
 }
