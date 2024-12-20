@@ -23,6 +23,7 @@
       <sourceFolder url="file://$MODULE_DIR$/2024/day16/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/2024/day17/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/2024/day18/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/2024/day19/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/2024/target" />
       <excludeFolder url="file://$MODULE_DIR$/archive/2022/target" />
       <excludeFolder url="file://$MODULE_DIR$/2024/day02/target" />
@@ -46,6 +47,7 @@
       <excludeFolder url="file://$MODULE_DIR$/2024/day16/target" />
       <excludeFolder url="file://$MODULE_DIR$/2024/day17/target" />
       <excludeFolder url="file://$MODULE_DIR$/2024/day18/target" />
+      <excludeFolder url="file://$MODULE_DIR$/2024/day19/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
