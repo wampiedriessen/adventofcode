@@ -3,7 +3,6 @@ use std::io;
 use std::io::Read;
 
 const NUMPAD: &'static str = "789\n456\n123\n 0A";
-
 const DIRPAD: &'static str = " ^A\n<v>";
 
 type CoordMap = HashMap<char, (usize, usize)>;
@@ -124,73 +123,46 @@ fn run(input: &String, nummapper: &Mapper, dirmapper: &Mapper, steps: usize) -> 
 
     let mut total: usize = 0;
     for line in input.lines() {
-        let mut translation = String::new();
+        let mut translation = 0;
         for ch in line.chars() {
-            translation += translate(ch, bots, &mut memory).as_str();
+            translation += translate(ch, bots, &mut memory);
         }
 
-        let sequence = translation.len();
-
-        println!("{}: {} -> {}", line, sequence, translation);
-
-        total += sequence * line[0..3].parse::<usize>().unwrap();
+        total += translation * line[0..3].parse::<usize>().unwrap();
     }
 
     total
 }
 
-fn translate(ch: char, bots: &mut [Bot], memory: &mut HashMap<(usize, String), String>) -> String {
+fn translate(ch: char, bots: &mut [Bot], memory: &mut HashMap<(usize, String), usize>) -> usize {
     if bots.len() == 0 {
-        return String::from(ch);
+        return 1;
     }
 
     let (bot, nextbots) = bots.split_first_mut().unwrap();
     let commands = bot.get_commands(ch);
 
-    let mut shortest: Option<String> = None;
+    let mut shortest = usize::MAX;
     for poss in commands {
         let key = (nextbots.len(), poss.clone());
-        let translation: String;
+        let translation: usize;
         if memory.contains_key(&key) {
-            translation = memory[&key].clone();
+            translation = memory[&key];
         } else {
-            let mut subbots = String::new();
+            let mut subbots = 0;
             for ch in poss.chars() {
-                subbots += translate(ch, nextbots, memory).as_str();
+                subbots += translate(ch, nextbots, memory);
             }
 
-            subbots += translate('A', nextbots, memory).as_str();
+            subbots += translate('A', nextbots, memory);
 
             memory.insert(key, subbots.clone());
             translation = subbots;
         };
 
-        if let Some(val) = &shortest {
-            if translation.len() < val.len() {
-                shortest = Some(translation.clone());
-            }
-            continue;
-        }
-
-        shortest = Some(translation.clone());
+        shortest = shortest.min(translation);
     }
 
     bot.pos = ch;
-    shortest.unwrap()
+    shortest
 }
-
-//
-// fn all_possibilities(ch: char, bots: &mut [&mut Bot; 3], depth: usize) -> HashSet<String> {
-//     if depth >= bots.len() { return HashSet::new(); }
-//     let mut out = HashSet::new();
-//
-//     for command in bots[depth].get_commands(ch) {
-//         let mut newcommand = command.clone();
-//         newcommand += "A";
-//         out.insert(newcommand);
-//     }
-//
-//     bots[depth].pos = ch;
-//
-//     out
-// }
