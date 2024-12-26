@@ -56,8 +56,7 @@ fn part1(connections: &HashMap<&str, HashSet<&str>>) -> usize {
 fn part2(connections: &HashMap<&str, HashSet<&str>>) -> String {
     let mut sets_by_alphabet: HashMap<String, Vec<HashSet<&str>>> = HashMap::new();
 
-    let mut pcs = connections.keys().cloned().collect::<Vec<_>>();
-    pcs.sort();
+    let pcs = connections.keys().cloned().collect::<Vec<_>>();
 
     for pc in &pcs {
         let mut pregroups = Vec::new();
