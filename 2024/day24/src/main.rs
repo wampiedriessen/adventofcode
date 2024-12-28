@@ -25,7 +25,7 @@ impl FromStr for Operand {
 }
 
 impl Operand {
-    fn compute(&self, a: u32, b: u32) -> u32 {
+    fn compute(&self, a: u8, b: u8) -> u8 {
         match self {
             Operand::AND => a & b,
             Operand::OR => a | b,
@@ -35,143 +35,138 @@ impl Operand {
 }
 
 #[derive(Debug, Clone, PartialOrd, PartialEq, Ord, Eq)]
-enum Wire {
-    Value(u32),
-    Gate(Operand, String, String),
+struct Gate {
+    a: String,
+    b: String,
+    op: Operand,
+    tgt: String,
 }
 
-impl Wire {
-    fn value(&self, gates: &HashMap<String, Wire>) -> u32 {
-        match self {
-            Wire::Value(v) => *v,
-            Wire::Gate(op, wire1, wire2) => {
-                op.compute(gates[wire1].value(gates), gates[wire2].value(gates))
-            }
+impl Gate {
+    fn from_input(input: &str) -> Self {
+        let parts = input.split_ascii_whitespace().collect::<Vec<_>>();
+        let a = parts[0].to_string();
+        let b = parts[2].to_string();
+        let tgt = parts[4].to_string();
+
+        let (a, b) = if a < b { (a, b) } else { (b, a) };
+
+        Gate {
+            a,
+            b,
+            tgt,
+            op: parts[1].parse().unwrap(),
         }
     }
 
-    fn operand(&self) -> Operand {
-        match self {
-            Wire::Value(_) => { panic!("Not a gate Wire!") }
-            Wire::Gate(op, _, _) => { *op }
-        }
+    fn value(&self, inputvalues: &HashMap<String, u8>, gates: &HashMap<String, Gate>) -> u8 {
+        let a = if let Some(&inwire) = inputvalues.get(&self.a) {
+            inwire
+        } else { gates[&self.a].value(inputvalues, gates) };
+        let b = if let Some(&inwire) = inputvalues.get(&self.b) {
+            inwire
+        } else { gates[&self.b].value(inputvalues, gates) };
+
+        self.op.compute(a, b)
     }
-
-    fn get_inputs(&self) -> Vec<&String> {
-        match self {
-            Wire::Value(_) => { panic!("Not a gate Wire!") }
-            Wire::Gate(_, a, b) => { vec![a, b] }
-        }
-    }
-}
-
-fn evaluate(wires: &Vec<String>, gates: &HashMap<String, Wire>) -> u64 {
-    let mut sum = 0;
-    for (i, zwire) in wires.iter().enumerate() {
-        sum += gates[zwire].value(gates) as u64 * 2u64.pow(i as u32)
-    }
-
-    sum
-}
-
-fn named_wires(prefix: &str, gates: &HashMap<String, Wire>) -> Vec<String> {
-    let mut wires = gates
-        .keys()
-        .filter(|&x| x.starts_with(prefix))
-        .cloned()
-        .collect::<Vec<_>>();
-    wires.sort();
-
-    wires
 }
 
 fn main() -> Result<(), ()> {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
 
+    let mut inputvalues = HashMap::new();
     let mut gates = HashMap::new();
     let mut input_to_tgt: HashMap<String, Vec<String>> = HashMap::new();
 
+    let mut x_wires = Vec::new();
+    let mut z_wires = Vec::new();
+
     for line in input.lines() {
         if line.contains(":") {
-            let (gate, value) = line.split_once(":").unwrap();
-            gates.insert(
-                gate.trim().to_string(),
-                Wire::Value(value.trim().parse().unwrap()),
-            );
+            let (wire, value) = line.split_once(":").unwrap();
+            inputvalues.insert(wire.trim().to_string(), value.trim().parse::<u8>().unwrap());
+
+            if wire.starts_with("x") {
+                x_wires.push(wire);
+            }
+
         } else if line.contains("->") {
-            let parts = line.split_ascii_whitespace().collect::<Vec<_>>();
-            let a = parts[0].to_string();
-            let b = parts[2].to_string();
-            let target = parts[4].to_string();
+            let gate = Gate::from_input(&line);
 
-            gates.insert(target.clone(), Wire::Gate(parts[1].parse()?, a.clone(), b.clone()));
+            if gate.tgt.starts_with("z") {
+                z_wires.push(gate.tgt.clone());
+            }
 
-            input_to_tgt.entry(a.clone()).or_default().push(target.clone());
-            input_to_tgt.entry(b.clone()).or_default().push(target.clone());
+            let tgt = &gate.tgt;
+
+            input_to_tgt.entry(gate.a.clone()).or_default().push(tgt.clone());
+            input_to_tgt.entry(gate.b.clone()).or_default().push(tgt.clone());
+            gates.insert(tgt.clone(), gate);
         }
     }
 
-    let z_wires = named_wires("z", &gates);
-    let zval = evaluate(&z_wires, &gates);
+    x_wires.sort();
+    z_wires.sort();
 
-    println!("Part 1: {}", zval);
+    // Part 1:
+    let mut compute = 0;
+    for (i, zwire) in z_wires.iter().enumerate() {
+        compute += gates[zwire].value(&inputvalues, &gates) as u64 * 2u64.pow(i as u32)
+    }
+
+    println!("Part 1: {}", compute);
 
     let mut faulty_gates = Vec::new();
-
     for (name, gate) in &gates {
+        let inputs = [&gate.a, &gate.b];
+
         if name.starts_with("z") {
-            if gate.operand() != Operand::XOR {
+            if gate.op != Operand::XOR {
                 // special last case
-                if z_wires[z_wires.len()-1] == *name && gate.operand() == Operand::OR { continue; }
+                if z_wires[z_wires.len()-1] == *name && gate.op == Operand::OR { continue; }
                 faulty_gates.push(name.clone());
             }
             continue;
-        } else if name.starts_with("x") || name.starts_with("y") {
-            continue;
         }
 
-        if gate.operand() == Operand::OR {
-            let inputs = gate.get_inputs();
-            for &faulty in inputs.iter().filter(|&&x| gates[x].operand() != Operand::AND) {
+        if gate.op == Operand::OR {
+            for &faulty in inputs.iter().filter(|&&x| gates[x].op != Operand::AND) {
                 faulty_gates.push(faulty.clone());
             }
         }
 
-        if gate.operand() == Operand::AND {
-            let inputs = gate.get_inputs();
-
+        if gate.op == Operand::AND {
             // special first case:
             if inputs.iter().all(|&x| x.ends_with("00")) { continue; }
 
-            let target = &input_to_tgt[name];
-            if target.len() != 1 {
+            let targets = &input_to_tgt[name];
+            if targets.len() != 1 {
                 faulty_gates.push(name.clone());
             }
 
-            if !inputs.iter().all(|&x| x.ends_with("00")) && gates[&target[0]].operand() != Operand::OR {
+            // end gates always go to OR gates
+            if gates[&targets[0]].op != Operand::OR {
                 faulty_gates.push(name.clone());
             }
         }
 
-        if gate.operand() == Operand::XOR {
-            let inputs = gate.get_inputs();
-
+        if gate.op == Operand::XOR {
             // special first case:
             if inputs.iter().all(|&x| x.ends_with("00")) { continue; }
 
-            let mut target = input_to_tgt[name].iter().map(|x| (gates[x].clone(), x.clone())).collect::<Vec<_>>();
-            target.sort();
+            let mut targets = input_to_tgt[name].iter().map(|x| (gates[x].clone(), x.clone())).collect::<Vec<_>>();
+            targets.sort();
 
-            let is_x_input = inputs.iter().all(|&input_wire| input_wire.starts_with("x") || input_wire.starts_with("y"));
-            if is_x_input {
-                if target.len() != 2 || target[0].0.operand() != Operand::XOR || target[1].0.operand() != Operand::AND {
+            let is_input_gate = inputs[0].starts_with("x") && inputs[1].starts_with("y");
+            if is_input_gate {
+                if targets.len() != 2 || targets[0].0.op != Operand::XOR || targets[1].0.op != Operand::AND {
                     faulty_gates.push(name.clone());
                 }
             }
-            if !is_x_input {
+            if !is_input_gate {
                 // non-z gate cannot be a grandparent of x/y (that is reserved for z-nodes)
-                if inputs.iter().any(|&x| gates[x].get_inputs().iter().all(|&x| x.starts_with("x") || x.starts_with("y"))) {
+                if inputs.iter().any(|&x| gates[x].a.starts_with("x") && gates[x].b.starts_with("y")) {
                     faulty_gates.push(name.clone());
                 }
             }
