@@ -167,7 +167,6 @@ impl PuzzleDay for Day06 {
 
     fn solve(&mut self) -> Result<(String, String), String> {
         let mut positions_seen = HashSet::new();
-        let mut stances_seen = HashSet::new();
         let mut possible_barriers = HashSet::new();
 
         loop {
@@ -177,15 +176,11 @@ impl PuzzleDay for Day06 {
             if !self.puzzlemap.is_outside(nextpos)
                 && *self.puzzlemap.get_mapitem(nextpos) == MapItem::Empty
                 && !positions_seen.contains(&nextpos) {
-                let mut new_map = self.puzzlemap.clone();
-                *new_map.get_mapitem(nextpos) = MapItem::Obstacle;
+                *self.puzzlemap.get_mapitem(nextpos) = MapItem::Obstacle;
 
                 let mut found_loop = true;
-                for _ in 0..10000 {
-                    if stances_seen.contains(&new_map.curpos()) {
-                        break;
-                    }
-                    if !new_map.next_step() {
+                for _ in 0..6000 {
+                    if !self.puzzlemap.next_step() {
                         found_loop = false;
                         break;
                     }
@@ -194,11 +189,15 @@ impl PuzzleDay for Day06 {
                 if found_loop {
                     possible_barriers.insert(nextpos);
                 }
+
+                *self.puzzlemap.get_mapitem(self.puzzlemap.guard_pos) = MapItem::Empty;
+                *self.puzzlemap.get_mapitem(nextpos) = MapItem::Empty;
+                *self.puzzlemap.get_mapitem((curpos.0, curpos.1)) = MapItem::Guard(curpos.2);
+                self.puzzlemap.guard_pos = (curpos.0, curpos.1);
             }
 
             // part1
             positions_seen.insert((curpos.0, curpos.1));
-            stances_seen.insert(curpos);
             if !self.puzzlemap.next_step() {
                 break;
             }
