@@ -6,7 +6,7 @@ fn main() {
     let out_dir = env::var_os("OUT_DIR").unwrap();
     let dest_path = Path::new(&out_dir).join("all-aoc-puzzles.rs");
 
-    let mut uses = String::from("use aoc_util::PuzzleDay;\n");
+    let mut uses = String::from("use aoc_util::PuzzleDay;\nuse std::time::SystemTime;\n");
     let mut main = String::new();
 
     for d in 1..=25 {
@@ -19,14 +19,18 @@ fn main() {
             uses += &format!("use day{day}::Day{day};\n");
             main += &format!(r#"
             let mut solution = Day{day}::new(include_str!(r"{path}"));
-            println!("🎅 Running Day {{}}:", "{day}");
-            if let Ok((a1, a2)) = solution.solve() {{
+            let start = SystemTime::now();
+            let answer = solution.solve();
+            println!("🎅 Running Day {day} (took {{}} ms):", start.elapsed().unwrap().as_millis());
+            if let Ok((a1, a2)) = answer {{
                 println!("  ⭐  Part 1: {{}}", a1);
                 println!("  ⭐  Part 2: {{}}", a2);
             }} else {{
                 println!("💥 Could not find solution for day {day}");
             }}
 "#);
+            // Recompile on input change
+            println!("cargo::rerun-if-changed=../puzzle-inputs/day{day}.txt");
         } else {
             main += &format!(r#"println!("⚠️ No input or lib file found for day {day}");"#);
         }
@@ -36,6 +40,4 @@ fn main() {
 fn all_aoc_puzzles() {{
     {main}
 }}")).unwrap();
-    println!("cargo::rerun-if-changed=all-aoc-puzzles.rs");
-    println!("cargo::rerun-if-changed=../puzzle-inputs/*.txt");
 }

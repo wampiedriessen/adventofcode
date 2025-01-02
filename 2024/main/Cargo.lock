@@ -58,6 +58,7 @@ dependencies = [
 name = "day03"
 version = "0.1.0"
 dependencies = [
+ "aoc-util",
  "lazy_static",
  "regex",
 ]
@@ -65,14 +66,23 @@ dependencies = [
 [[package]]
 name = "day04"
 version = "0.1.0"
+dependencies = [
+ "aoc-util",
+]
 
 [[package]]
 name = "day05"
 version = "0.1.0"
+dependencies = [
+ "aoc-util",
+]
 
 [[package]]
 name = "day06"
 version = "0.1.0"
+dependencies = [
+ "aoc-util",
+]
 
 [[package]]
 name = "day07"

@@ -1,9 +1,8 @@
 use std::cmp::PartialEq;
 use std::collections::HashSet;
 use std::fmt::{Debug, Formatter, Write};
-use std::io;
-use std::io::Read;
 use std::str::FromStr;
+use aoc_util::PuzzleDay;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 enum Direction {
@@ -33,7 +32,7 @@ impl Direction {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 enum MapItem {
     Guard(Direction),
     Obstacle,
@@ -148,53 +147,63 @@ impl PuzzleMap {
             _ => panic!("no guard at curpos!"),
         }
     }
+    fn curpos(&self) -> (i32, i32, Direction) {
+        let pos = self.guard_pos;
+        match self.map[pos.0 as usize][pos.1 as usize] {
+            MapItem::Guard(direction) => (pos.0, pos.1, direction),
+            _ => panic!("no guard here")
+        }
+    }
 }
 
-fn main() -> io::Result<()> {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input)?;
+pub struct Day06 {
+    puzzlemap: PuzzleMap,
+}
 
-    let mut positions_seen = HashSet::new();
-    let mut possible_barriers = HashSet::new();
+impl PuzzleDay for Day06 {
+    fn new(input: &str) -> Self {
+        Day06 { puzzlemap: PuzzleMap::from_str(&input).unwrap() }
+    }
 
-    let mut puzzlemap = PuzzleMap::from_str(&input).unwrap();
-    loop {
-        // part2
-        let curdir = match *puzzlemap.get_mapitem(puzzlemap.guard_pos) {
-            MapItem::Guard(direction) => direction,
-            _ => panic!("no guard here")
-        };
-        let nextpos = curdir.next_pos(puzzlemap.guard_pos);
-        if !puzzlemap.is_outside(nextpos)
-            && *puzzlemap.get_mapitem(nextpos) == MapItem::Empty
-            && !positions_seen.contains(&nextpos) {
-            let mut new_map = puzzlemap.clone();
-            *new_map.get_mapitem(puzzlemap.guard_pos) = MapItem::Guard(curdir.turn());
-            *new_map.get_mapitem(nextpos) = MapItem::Obstacle;
+    fn solve(&mut self) -> Result<(String, String), String> {
+        let mut positions_seen = HashSet::new();
+        let mut stances_seen = HashSet::new();
+        let mut possible_barriers = HashSet::new();
 
-            let mut found_loop = true;
-            for _ in 0..10000 {
-                if !new_map.next_step() {
-                    found_loop = false;
-                    break;
+        loop {
+            // part2
+            let curpos = self.puzzlemap.curpos();
+            let nextpos = curpos.2.next_pos(self.puzzlemap.guard_pos);
+            if !self.puzzlemap.is_outside(nextpos)
+                && *self.puzzlemap.get_mapitem(nextpos) == MapItem::Empty
+                && !positions_seen.contains(&nextpos) {
+                let mut new_map = self.puzzlemap.clone();
+                *new_map.get_mapitem(nextpos) = MapItem::Obstacle;
+
+                let mut found_loop = true;
+                for _ in 0..10000 {
+                    if stances_seen.contains(&new_map.curpos()) {
+                        break;
+                    }
+                    if !new_map.next_step() {
+                        found_loop = false;
+                        break;
+                    }
+                }
+
+                if found_loop {
+                    possible_barriers.insert(nextpos);
                 }
             }
 
-            if found_loop {
-                possible_barriers.insert(nextpos);
+            // part1
+            positions_seen.insert((curpos.0, curpos.1));
+            stances_seen.insert(curpos);
+            if !self.puzzlemap.next_step() {
+                break;
             }
         }
 
-        // part1
-        positions_seen.insert(puzzlemap.guard_pos);
-        if !puzzlemap.next_step() {
-            break;
-        }
+        Ok((positions_seen.len().to_string(), possible_barriers.len().to_string()))
     }
-
-    println!("Part 1: {}", positions_seen.len());
-
-    println!("Part 2: {}", possible_barriers.len());
-
-    Ok(())
 }
